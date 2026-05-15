@@ -1,0 +1,13 @@
+version: 1.0.0
+skillVersion: 1.0.0
+displayName: 混元图片生成
+emoji: 🖼️
+category: productivity
+type:
+  - skill
+autoActivate: false
+mcpTools:
+  server: claude-code
+  include:
+    - image_hunyuan__generate_image
+    - image_hunyuan__list_styles
