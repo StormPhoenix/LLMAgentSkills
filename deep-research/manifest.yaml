@@ -6,4 +6,4 @@ category: user
 type:
   - skill
 peerSkills:
-  - file-manager
+  - file-write

@@ -5,6 +5,7 @@ metadata:
   toolbox:
     version: "1.0.0"
     emoji: "📄"
+    displayName: "Markdown 转 PDF"
     tools:
       - name: convert_md_to_pdf
         description: |
