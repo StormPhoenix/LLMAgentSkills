@@ -2,11 +2,9 @@
 name: md-to-pdf-cjk
 description: 将 Markdown 文件转换为专业 PDF 文档，完整支持中日韩字符渲染，无需 LaTeX 或 wkhtmltopdf
 metadata:
-  clawpet:
-    builtin: false
+  toolbox:
     version: "1.0.0"
     emoji: "📄"
-    displayName: "Markdown转PDF"
     tools:
       - name: convert_md_to_pdf
         description: |
