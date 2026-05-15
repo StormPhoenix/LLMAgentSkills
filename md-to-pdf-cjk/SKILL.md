@@ -43,7 +43,8 @@ metadata:
 
 ## 注意事项
 
-- Windows 系统使用 Edge 浏览器 headless 模式生成 PDF，无需额外安装
-- 中文字体使用系统自带微软雅黑，无需手动配置
+- 使用系统中已安装的 Chrome 或 Edge（headless 模式）生成 PDF，无需额外安装
+- Windows 优先使用 Edge，macOS/Linux 使用 Chrome
+- 中文字体：Windows 使用微软雅黑，macOS 使用 PingFang SC，无需手动配置
 - riskLevel 为 MODERATE，因为会写入文件系统
 - 如果系统未找到 Chrome/Edge，会降级输出 HTML 文件

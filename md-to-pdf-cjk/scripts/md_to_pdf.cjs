@@ -173,7 +173,8 @@ async function execute(input, context) {
     }
 
     // 使用 headless 浏览器打印 PDF
-    const cmd = `"${browser}" --headless --disable-gpu --no-sandbox --print-to-pdf="${resolvedOutput}" --print-to-pdf-no-header "${tmpHtml}"`;
+    const fileUrl = `file://${tmpHtml.replace(/\\/g, '/')}`;
+    const cmd = `"${browser}" --headless --disable-gpu --no-sandbox --print-to-pdf="${resolvedOutput}" --print-to-pdf-no-header "${fileUrl}"`;
     execSync(cmd, { timeout: 30000, stdio: 'pipe' });
 
     // 清理临时文件
