@@ -3,5 +3,7 @@ skillVersion: 1.2.0
 displayName: 深度调研
 emoji: 🔬
 category: user
+type:
+  - skill
 peerSkills:
   - file-manager
