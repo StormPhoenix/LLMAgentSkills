@@ -1,0 +1,8 @@
+version: 1.0.0
+skillVersion: 1.0.0
+displayName: Markdown 转 PDF
+emoji: 📄
+category: productivity
+type:
+  - skill
+autoActivate: false

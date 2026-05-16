@@ -2,8 +2,9 @@ version: 1.0.0
 skillVersion: 1.2.0
 displayName: 深度调研
 emoji: 🔬
-category: user
+category: productivity
 type:
   - skill
+autoActivate: false
 peerSkills:
   - file-write
