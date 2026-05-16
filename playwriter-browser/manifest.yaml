@@ -1,0 +1,13 @@
+version: 1.0.0
+skillVersion: 1.0.0
+displayName: 浏览器自动化
+emoji: 🌐
+category: productivity
+type:
+  - skill
+autoActivate: false
+mcpTools:
+  server: playwriter
+  include:
+    - execute
+    - reset
