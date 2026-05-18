@@ -5,13 +5,6 @@ description: >
   涵盖色彩、字体、组件、布局等完整设计 Token。
   当用户想要构建类似某品牌风格的 UI、需要设计系统模板、
   或说"做成 XX 风格"时使用此技能。
-metadata:
-  clawpet:
-    version: "1.0.0"
-    emoji: "🎨"
-    displayName: "设计专家"
-    autoActivate: false
-allowed-tools: Read,Write,Bash
 ---
 
 # 品牌设计风格专家

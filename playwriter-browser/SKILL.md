@@ -1,9 +1,6 @@
 ---
 name: playwriter-browser
 description: 通过 Playwriter 控制用户 Chrome 浏览器（点击、填表、截图、抓取页面）。需要打开网页、操作浏览器、自动化网页任务时使用。
-metadata:
-  toolbox:
-    type: skill
 ---
 # 浏览器自动化（Playwriter）
 
