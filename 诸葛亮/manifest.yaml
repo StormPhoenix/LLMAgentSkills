@@ -1,8 +1,0 @@
-version: 1.0.0
-skillVersion: 1.0.0
-displayName: 诸葛亮思维框架
-emoji: 🪁
-category: creativity
-type:
-  - persona
-autoActivate: false

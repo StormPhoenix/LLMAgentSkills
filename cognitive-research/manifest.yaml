@@ -1,0 +1,8 @@
+version: 1.0.0
+skillVersion: 1.0.0
+displayName: 认知路径调研写作
+emoji: 🧭
+category: productivity
+type:
+  - skill
+autoActivate: false
