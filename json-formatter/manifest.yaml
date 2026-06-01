@@ -1,0 +1,26 @@
+version: "1.0.0"
+displayName: "JSON 格式化"
+emoji: "🗂️"
+
+tools:
+  - name: format_json_file
+    description: |
+      将指定 JSON 文件的内容按标准 JSON 格式（2 空格缩进）格式化，并写回文件。
+      可选择写入新路径而不覆盖原文件。
+      若文件内容不是合法 JSON，会报告解析错误而不修改文件。
+    inputSchema:
+      type: object
+      properties:
+        inputPath:
+          type: string
+          description: "要格式化的 JSON 文件路径"
+        outputPath:
+          type: string
+          description: "输出路径（可选，默认覆盖原文件）"
+        indent:
+          type: number
+          description: "缩进空格数（可选，默认 2）"
+      required:
+        - inputPath
+    riskLevel: MODERATE
+    scriptEntry: scripts/json_format.cjs

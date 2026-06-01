@@ -1,0 +1,8 @@
+version: 1.0.0
+skillVersion: 1.0.0
+displayName: 知识图谱驱动写作法
+emoji: 🗺️
+category: creativity
+type:
+  - skill
+autoActivate: false

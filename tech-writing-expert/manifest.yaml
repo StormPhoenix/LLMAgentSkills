@@ -1,0 +1,8 @@
+version: 1.0.0
+skillVersion: 1.0.0
+displayName: 深度技术调研写作专家
+emoji: 📝
+category: creativity
+type:
+  - skill 
+autoActivate: false
