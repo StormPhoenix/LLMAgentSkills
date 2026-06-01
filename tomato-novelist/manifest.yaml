@@ -1,0 +1,33 @@
+version: "1.0.0"
+type: skill
+displayName: "番茄小说创作助手"
+emoji: "🍅"
+
+tools:
+  - name: check_wordcount
+    displayName: 章节字数检查
+    description: |
+      检查番茄小说章节文件的中文字符数，判断是否在2200-2800字最佳区间。
+      - 单章检查：传入章节文件的绝对路径
+      - 批量检查：传入小说目录的绝对路径，并设置 check_all 为 true，检查目录下所有"第*.md"章节文件
+      返回每章字数、达标状态（pass/short/long）和修改建议。
+      统计时自动过滤 Markdown 格式符号（标题#、加粗**、斜体*、行内代码`、链接），只统计正文中文字符。
+    inputSchema:
+      type: object
+      properties:
+        path:
+          type: string
+          description: 章节文件的绝对路径（单章检查）或小说目录的绝对路径（批量检查）
+        check_all:
+          type: boolean
+          description: 是否批量检查目录下所有章节，默认 false（单章模式）
+        min_words:
+          type: number
+          description: 字数下限，默认 2200
+        max_words:
+          type: number
+          description: 字数上限，默认 2800
+      required:
+        - path
+    riskLevel: SAFE
+    scriptEntry: scripts/tomato.cjs

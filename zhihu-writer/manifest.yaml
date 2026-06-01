@@ -1,0 +1,78 @@
+version: "1.0.0"
+type: skill
+displayName: "知乎写作助手"
+emoji: "📝"
+
+tools:
+  - name: zhihu_answer
+    displayName: 生成知乎回答框架
+    description: |
+      生成符合知乎高赞风格的回答框架，包含开头钩子和完整结构占位符。
+      支持 4 种风格：
+      - professional（专业型）：观点→分析→案例→总结，适合技术/学习/职场类
+      - story（故事型）：场景铺垫→冲突→转折→感悟，适合个人经历/情感类
+      - data（数据型）：结论→数据表格→趋势分析→深层原因，适合经济/科技类
+      - debate（辩论型）：指出误区→反驳逻辑→正面论证，适合争议性问题
+      返回带占位符的 Markdown 框架，填充实际内容后即可发布。
+    inputSchema:
+      type: object
+      properties:
+        question:
+          type: string
+          description: 知乎问题的完整文本
+        style:
+          type: string
+          description: "回答风格，可选值：professional | story | data | debate，默认 professional"
+      required:
+        - question
+    riskLevel: SAFE
+    scriptEntry: scripts/zhihu.cjs
+
+  - name: zhihu_article
+    displayName: 生成知乎专栏文章框架
+    description: |
+      生成知乎专栏文章的完整结构框架，包含开头引言、分章节论述、案例研究、总结展望等模块。
+      返回带占位符的 Markdown 框架，填充实际内容后即可发布到知乎专栏。
+    inputSchema:
+      type: object
+      properties:
+        topic:
+          type: string
+          description: 文章主题或标题
+      required:
+        - topic
+    riskLevel: SAFE
+    scriptEntry: scripts/zhihu.cjs
+
+  - name: zhihu_title
+    displayName: 生成知乎爆款标题
+    description: |
+      根据主题生成 5 个风格各异的知乎爆款标题备选，覆盖数字型、反问型、争议型、故事型、问答型等多种标题公式。
+      同时输出标题技巧提示，帮助选择最适合的标题。
+    inputSchema:
+      type: object
+      properties:
+        topic:
+          type: string
+          description: 标题主题关键词
+      required:
+        - topic
+    riskLevel: SAFE
+    scriptEntry: scripts/zhihu.cjs
+
+  - name: zhihu_salt
+    displayName: 生成知乎盐选故事开头
+    description: |
+      生成知乎盐选付费故事风格的开头（800-1200字框架），包含悬念钩子、人物设定、情节铺垫，
+      并在最精彩处设置付费墙截断。支持都市情感、职场暗战、悬疑推理三种类型，随机选取。
+      同时输出盐选写作技巧提示。
+    inputSchema:
+      type: object
+      properties:
+        topic:
+          type: string
+          description: 故事话题或核心冲突关键词（如"婚姻""职场""悬疑"）
+      required:
+        - topic
+    riskLevel: SAFE
+    scriptEntry: scripts/zhihu.cjs
