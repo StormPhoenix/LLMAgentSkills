@@ -1,0 +1,8 @@
+version: 1.0.0
+skillVersion: 1.0.0
+displayName: 马前卒分析框架
+emoji: 📊
+category: productivity
+type:
+  - skill
+autoActivate: false
