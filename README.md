@@ -128,6 +128,7 @@ mcpTools:              # 声明本 Skill 依赖的 MCP 工具（可选）
 | 目录 | 类型 | 描述 |
 |------|------|------|
 | `hunyuan-image-gen/` | tool | 腾讯混元文生图，12 种预设风格 |
+| `local-transcribe/` | tool | 本地语音/视频转录，支持 mp4/mkv/mp3 等，输出纯文字或 SRT 字幕；通过 configs 配置服务地址 |
 | `女娲-诸葛亮/` | persona | 三国蜀汉丞相诸葛亮思维框架 |
 | `女娲-曹孟德/` | persona | 三国魏武帝曹操思维框架 |
 | `公众人物-诸葛亮/` | persona | 诸葛亮（公众人物版） |
@@ -160,6 +161,14 @@ mcpTools:              # 声明本 Skill 依赖的 MCP 工具（可选）
 - Tool 类 Skill 应包含：工具说明、参数表、响应格式、常见使用场景
 - 存在 `manifest.yaml` 时，其 `type` 字段必须与 `SKILL.md` 中 `metadata.toolbox.type` 保持一致，**`manifest.yaml` 中的值优先**
 - `.cjs` 脚本**禁止 `require` 第三方 npm 包**，仅允许 Node 内置模块与 `electron`
+- **读取用户配置（`configs[]`）必须使用 `context.getConfig(key)`**，而非 `context.config.key`：
+  ```javascript
+  // ✅ 正确
+  const apiKey = context.getConfig ? String(context.getConfig('apiKey') || '') : '';
+  // ❌ 错误（context.config 不存在，永远返回 undefined）
+  const apiKey = context.config?.apiKey;
+  ```
+  `getConfig` 由 SkillRegistry 在运行时注入，对应 `manifest.yaml` 的 `configs[]` 定义，取用户在 Settings 中填写的值。
 - 目录名建议使用 kebab-case 或语义化中文（与 Skill `name` 字段保持对应）
 
 ---

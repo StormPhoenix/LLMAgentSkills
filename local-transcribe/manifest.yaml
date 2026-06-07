@@ -1,0 +1,79 @@
+version: "1.0.0"
+displayName: "本地转录"
+emoji: "🎙️"
+type:
+  - skill
+
+tools:
+  - name: transcribe_check_env
+    displayName: "检查转录服务环境"
+    description: |
+      检查本地转录服务的运行状态。
+      返回服务是否可达、模型是否已加载完毕、ffmpeg 是否可用、推理设备信息。
+
+      使用场景：
+      - 转录前确认服务就绪
+      - 用户报告转录失败时排查环境问题
+
+      返回结构：
+      - reachable: boolean — 服务是否可达
+      - model_loaded: boolean — 推理模型是否已加载完毕
+      - ffmpeg_available: boolean — 音视频处理工具（ffmpeg）是否可用
+      - device: string — 推理设备（"cpu" / "cuda" / "mps"）
+      - error: string? — 不可达时的错误信息
+    inputSchema:
+      type: object
+      properties: {}
+    riskLevel: SAFE
+    scriptEntry: scripts/asr.cjs
+
+  - name: transcribe
+    displayName: "转录音视频"
+    description: |
+      将本地音频或视频文件转录为文字或字幕，在本机离线运行。
+
+      使用场景：
+      - 转录会议录音、播客、课程视频
+      - 生成视频字幕文件（SRT 格式）
+      - 将音频内容转为可编辑文本
+
+      不要使用的场景：
+      - file_path 是 URL 而非本地路径（本工具只接受本地绝对路径）
+      - 文件超过 30 分钟（建议改用后台任务）
+
+      返回结构：
+      - success: boolean
+      - text: string — 转录文字（txt 格式）或 SRT 字幕内容
+      - duration_seconds: number — 音频时长（秒）
+      - language_detected: string — 识别到的语言
+      - elapsed_seconds: number — 转录耗时（秒）
+      - error: string? — 失败时的错误信息
+    inputSchema:
+      type: object
+      properties:
+        file_path:
+          type: string
+          description: "本地媒体文件的绝对路径，支持 mp4/mkv/avi/mp3/m4a/wav"
+        output_format:
+          type: string
+          description: "输出格式：txt（纯文字，默认）或 srt（含时间戳字幕）"
+        language:
+          type: string
+          description: "语言提示：zh（中文）、en（英文）、auto（自动检测，默认）"
+      required:
+        - file_path
+    riskLevel: SAFE
+    scriptEntry: scripts/asr.cjs
+
+configs:
+  - key: serviceUrl
+    label: "转录服务地址"
+    type: string
+    defaultValue: "http://localhost:8765"
+    description: "本地转录服务的根地址。默认 http://localhost:8765，如服务运行在其他地址请修改。"
+
+  - key: timeoutMs
+    label: "请求超时（毫秒）"
+    type: number
+    defaultValue: 600000
+    description: "转录请求的超时时间（毫秒），默认 10 分钟（600000）。大文件可适当调大。"
