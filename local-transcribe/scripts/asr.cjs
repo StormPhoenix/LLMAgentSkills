@@ -4,33 +4,22 @@
 // 通过 HTTP 调用配置的转录服务 REST API
 // 只使用 Node 内置模块，无第三方依赖
 
-const http = require('http');
+const http  = require('http');
 const https = require('https');
-const url = require('url');
+const url   = require('url');
 
 // ─── 配置读取 ─────────────────────────────────────────────────
 
-/**
- * 从 context.getConfig(key) 读取用户在 Settings 中配置的值。
- * context.getConfig 由 SkillRegistry 注入，对应 manifest.yaml 的 configs[] 定义。
- */
 function getConfig(context) {
   const serviceUrl = (
     context.getConfig ? String(context.getConfig('serviceUrl') || '') : ''
   ).replace(/\/$/, '') || 'http://localhost:8765';
 
-  const timeoutMs = context.getConfig
-    ? Number(context.getConfig('timeoutMs') || 0) || 600000
-    : 600000;
-
-  return { serviceUrl, timeoutMs };
+  return { serviceUrl };
 }
 
 // ─── HTTP 工具函数 ────────────────────────────────────────────
 
-/**
- * 发起 HTTP/HTTPS 请求，返回 Promise<{ statusCode, body }>
- */
 function request(options, bodyStr, timeoutMs) {
   return new Promise((resolve, reject) => {
     const lib = options.protocol === 'https:' ? https : http;
@@ -57,45 +46,62 @@ function request(options, bodyStr, timeoutMs) {
   });
 }
 
-/**
- * GET 请求
- */
-async function httpGet(baseUrl, path, timeoutMs) {
+function httpGet(baseUrl, path, timeoutMs) {
   const parsed = new url.URL(baseUrl + path);
   return request(
     {
       protocol: parsed.protocol,
       hostname: parsed.hostname,
-      port: parsed.port,
-      path: parsed.pathname + parsed.search,
-      method: 'GET',
+      port:     parsed.port,
+      path:     parsed.pathname + parsed.search,
+      method:   'GET',
     },
     null,
-    timeoutMs
+    timeoutMs || 10000
   );
 }
 
-/**
- * POST JSON 请求
- */
-async function httpPost(baseUrl, path, payload, timeoutMs) {
+function httpPost(baseUrl, path, payload, timeoutMs) {
   const parsed = new url.URL(baseUrl + path);
-  const body = JSON.stringify(payload);
+  const body   = JSON.stringify(payload);
   return request(
     {
       protocol: parsed.protocol,
       hostname: parsed.hostname,
-      port: parsed.port,
-      path: parsed.pathname + parsed.search,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+      port:     parsed.port,
+      path:     parsed.pathname + parsed.search,
+      method:   'POST',
+      headers:  {
+        'Content-Type':   'application/json',
         'Content-Length': Buffer.byteLength(body),
       },
     },
     body,
-    timeoutMs
+    timeoutMs || 10000
   );
+}
+
+function httpDelete(baseUrl, path, timeoutMs) {
+  const parsed = new url.URL(baseUrl + path);
+  return request(
+    {
+      protocol: parsed.protocol,
+      hostname: parsed.hostname,
+      port:     parsed.port,
+      path:     parsed.pathname + parsed.search,
+      method:   'DELETE',
+    },
+    null,
+    timeoutMs || 10000
+  );
+}
+
+function parseJson(raw, statusCode) {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    throw new Error(`服务响应解析失败（HTTP ${statusCode}）：${raw.slice(0, 200)}`);
+  }
 }
 
 // ─── 工具实现 ─────────────────────────────────────────────────
@@ -104,27 +110,27 @@ async function httpPost(baseUrl, path, payload, timeoutMs) {
  * transcribe_check_env — 检查转录服务环境
  */
 async function checkEnv(context) {
-  const { serviceUrl, timeoutMs } = getConfig(context);
+  const { serviceUrl } = getConfig(context);
 
   let res;
   try {
-    res = await httpGet(serviceUrl, '/api/env', Math.min(timeoutMs, 10000));
+    res = await httpGet(serviceUrl, '/api/env', 10000);
   } catch (err) {
     return {
-      reachable: false,
-      model_loaded: false,
-      ffmpeg_available: false,
-      device: 'unknown',
+      reachable:         false,
+      model_loaded:      false,
+      ffmpeg_available:  false,
+      device:            'unknown',
       error: `服务不可达：${err.message}。请确认转录服务已启动，并检查 Skill 配置中的服务地址是否正确。`,
     };
   }
 
   if (res.statusCode !== 200) {
     return {
-      reachable: false,
-      model_loaded: false,
+      reachable:        false,
+      model_loaded:     false,
       ffmpeg_available: false,
-      device: 'unknown',
+      device:           'unknown',
       error: `服务返回异常状态码：${res.statusCode}`,
     };
   }
@@ -134,29 +140,28 @@ async function checkEnv(context) {
     data = JSON.parse(res.body);
   } catch {
     return {
-      reachable: true,
-      model_loaded: false,
+      reachable:        true,
+      model_loaded:     false,
       ffmpeg_available: false,
-      device: 'unknown',
-      error: '服务响应解析失败，返回内容非合法 JSON',
+      device:           'unknown',
+      error:            '服务响应解析失败，返回内容非合法 JSON',
     };
   }
 
   return {
-    reachable: true,
-    model_loaded: data.model_loaded === true,
-    ffmpeg_available: data.ffmpeg_available === true,
-    device: data.device || 'unknown',
+    reachable:        true,
+    model_loaded:     data.model_loaded      === true,
+    ffmpeg_available: data.ffmpeg_available  === true,
+    device:           data.device            || 'unknown',
   };
 }
 
 /**
- * transcribe — 转录本地音视频文件
+ * submit_transcribe_job — 提交异步转录任务，立即返回 job_id
  */
-async function transcribe(input, context) {
+async function submitTranscribeJob(input, context) {
   const { file_path, output_format = 'txt', language = 'auto' } = input;
 
-  // 参数校验
   if (!file_path || typeof file_path !== 'string') {
     return { success: false, error: 'file_path 不能为空，且必须是本地绝对路径' };
   }
@@ -167,63 +172,121 @@ async function transcribe(input, context) {
     return { success: false, error: `language 只支持 "auto" / "zh" / "en"，收到：${language}` };
   }
 
-  let serviceUrl, timeoutMs;
-  ({ serviceUrl, timeoutMs } = getConfig(context));
+  const { serviceUrl } = getConfig(context);
 
-  // 快速检查服务是否就绪（5 秒超时）
+  // 先确认服务就绪
   try {
-    const envRes = await httpGet(serviceUrl, '/api/health', 5000);
-    if (envRes.statusCode === 200) {
-      const health = JSON.parse(envRes.body);
-      if (health.model_loaded === false) {
+    const health = await httpGet(serviceUrl, '/api/health', 5000);
+    if (health.statusCode === 200) {
+      const h = JSON.parse(health.body);
+      if (h.model_loaded === false) {
         return {
           success: false,
-          error: '推理模型尚未加载完成，请等待服务初始化后重试（首次启动通常需要 30-60 秒）',
+          error:   '推理模型尚未加载完成，请等待服务初始化后重试（首次启动通常需要 30-60 秒）',
         };
       }
     }
   } catch (err) {
     return {
       success: false,
-      error: `服务不可达：${err.message}。请确认转录服务已启动，并检查 Skill 配置中的服务地址是否正确。`,
+      error:   `服务不可达：${err.message}。请确认转录服务已启动，并检查 Skill 配置中的服务地址是否正确。`,
     };
   }
 
-  // 发起转录请求（长超时）
+  // 提交异步任务
   let res;
   try {
     res = await httpPost(
       serviceUrl,
-      '/api/transcribe',
+      '/api/jobs',
       { file_path, output_format, language },
-      timeoutMs
+      10000
     );
   } catch (err) {
-    return { success: false, error: `转录请求失败：${err.message}` };
+    return { success: false, error: `提交任务失败：${err.message}` };
   }
 
   let data;
   try {
-    data = JSON.parse(res.body);
-  } catch {
-    return {
-      success: false,
-      error: `服务响应解析失败（HTTP ${res.statusCode}）：${res.body.slice(0, 200)}`,
-    };
+    data = parseJson(res.body, res.statusCode);
+  } catch (err) {
+    return { success: false, error: err.message };
   }
 
-  if (res.statusCode !== 200 || !data.success) {
+  if (!data.success) {
     return { success: false, error: data.error || `服务返回错误（HTTP ${res.statusCode}）` };
   }
 
   return {
-    success: true,
-    text: data.text,
-    duration_seconds: data.duration_seconds,
-    language_detected: data.language_detected,
-    elapsed_seconds: data.elapsed_seconds,
-    format: data.format || output_format,
+    success:  true,
+    job_id:   data.job_id,
+    status:   data.status,
+    poll_url: data.poll_url,
   };
+}
+
+/**
+ * check_transcribe_job — 查询转录任务进度/结果
+ */
+async function checkTranscribeJob(input, context) {
+  const { job_id } = input;
+
+  if (!job_id || typeof job_id !== 'string') {
+    return { error: 'job_id 不能为空' };
+  }
+
+  const { serviceUrl } = getConfig(context);
+
+  let res;
+  try {
+    res = await httpGet(serviceUrl, `/api/jobs/${encodeURIComponent(job_id)}`, 10000);
+  } catch (err) {
+    return { error: `查询失败：${err.message}` };
+  }
+
+  if (res.statusCode === 404) {
+    return { error: `job_id 不存在：${job_id}（服务可能已重启，任务记录丢失）` };
+  }
+
+  let data;
+  try {
+    data = parseJson(res.body, res.statusCode);
+  } catch (err) {
+    return { error: err.message };
+  }
+
+  return data;
+}
+
+/**
+ * list_transcribe_jobs — 列出所有转录任务
+ */
+async function listTranscribeJobs(context) {
+  const { serviceUrl } = getConfig(context);
+
+  let res;
+  try {
+    res = await httpGet(serviceUrl, '/api/jobs', 10000);
+  } catch (err) {
+    return { error: `查询失败：${err.message}` };
+  }
+
+  // 兼容：服务端 list_jobs 通过 MCP 暴露，REST 侧当前未单独提供 GET /api/jobs 列表接口
+  // 若返回 404，提示用户通过 MCP 工具 list_jobs 查询
+  if (res.statusCode === 404) {
+    return {
+      error: '列表接口不可用，请通过 MCP 工具 mcp__qwen-asr__list_jobs 查询，或逐个使用 check_transcribe_job 查询已知 job_id',
+    };
+  }
+
+  let data;
+  try {
+    data = parseJson(res.body, res.statusCode);
+  } catch (err) {
+    return { error: err.message };
+  }
+
+  return data;
 }
 
 // ─── 入口分发 ─────────────────────────────────────────────────
@@ -232,8 +295,12 @@ async function execute(input, context) {
   switch (context.toolName) {
     case 'transcribe_check_env':
       return checkEnv(context);
-    case 'transcribe':
-      return transcribe(input, context);
+    case 'submit_transcribe_job':
+      return submitTranscribeJob(input, context);
+    case 'check_transcribe_job':
+      return checkTranscribeJob(input, context);
+    case 'list_transcribe_jobs':
+      return listTranscribeJobs(context);
     default:
       return { success: false, error: `未知工具：${context.toolName}` };
   }

@@ -27,27 +27,22 @@ tools:
     riskLevel: SAFE
     scriptEntry: scripts/asr.cjs
 
-  - name: transcribe
-    displayName: "转录音视频"
+  - name: submit_transcribe_job
+    displayName: "提交转录任务"
     description: |
-      将本地音频或视频文件转录为文字或字幕，在本机离线运行。
+      向本地转录服务提交一个异步转录任务，立即返回 job_id，不等待转录完成。
 
-      使用场景：
-      - 转录会议录音、播客、课程视频
-      - 生成视频字幕文件（SRT 格式）
-      - 将音频内容转为可编辑文本
-
-      不要使用的场景：
-      - file_path 是 URL 而非本地路径（本工具只接受本地绝对路径）
-      - 文件超过 30 分钟（建议改用后台任务）
+      ⚠️ 重要：转录为极耗时操作（数分钟），此工具只负责提交，不阻塞 Agent 循环。
+      提交后请通过以下方式获取结果：
+      - 在 Chat 中查询：调用 check_transcribe_job(job_id)
+      - 后台自动轮询：让用户创建 Daemon Task（program 执行体），脚本模板见 SKILL.md
 
       返回结构：
       - success: boolean
-      - text: string — 转录文字（txt 格式）或 SRT 字幕内容
-      - duration_seconds: number — 音频时长（秒）
-      - language_detected: string — 识别到的语言
-      - elapsed_seconds: number — 转录耗时（秒）
-      - error: string? — 失败时的错误信息
+      - job_id: string — 任务 ID（如 asr_abc12345），用于后续查询
+      - status: "queued" — 任务已进入队列
+      - poll_url: string — 查询地址（REST）
+      - error: string? — 提交失败时的错误信息
     inputSchema:
       type: object
       properties:
@@ -65,15 +60,56 @@ tools:
     riskLevel: SAFE
     scriptEntry: scripts/asr.cjs
 
+  - name: check_transcribe_job
+    displayName: "查询转录任务"
+    description: |
+      查询指定转录任务的当前状态和结果，秒级返回，不阻塞 Agent 循环。
+
+      status 含义：
+      - queued：任务排队中，等待推理资源
+      - running：正在转录
+      - done：转录完成，text 字段包含完整结果
+      - error：转录失败，error_message 字段包含原因
+
+      返回结构：
+      - job_id: string
+      - status: string
+      - text: string? — 转录结果（仅 status=done 时存在）
+      - duration_seconds: number? — 音频时长（仅 done 时存在）
+      - elapsed_seconds: number? — 转录耗时（仅 done 时存在）
+      - language_detected: string? — 识别语言（仅 done 时存在）
+      - error_message: string? — 错误信息（仅 error 时存在）
+    inputSchema:
+      type: object
+      properties:
+        job_id:
+          type: string
+          description: "转录任务 ID，由 submit_transcribe_job 返回（格式：asr_xxxxxxxx）"
+      required:
+        - job_id
+    riskLevel: SAFE
+    scriptEntry: scripts/asr.cjs
+
+  - name: list_transcribe_jobs
+    displayName: "列出转录任务"
+    description: |
+      列出所有转录任务的状态摘要（最多 50 条，按提交时间倒序）。
+      秒级返回，不阻塞 Agent 循环。
+
+      返回结构：
+      - jobs: array — 任务列表，每条含 job_id / status / file_path / submitted_at /
+                      finished_at / elapsed_seconds / language_detected /
+                      text（前 200 字预览）
+      - total: number — 历史任务总数
+    inputSchema:
+      type: object
+      properties: {}
+    riskLevel: SAFE
+    scriptEntry: scripts/asr.cjs
+
 configs:
   - key: serviceUrl
     label: "转录服务地址"
     type: string
     defaultValue: "http://localhost:8765"
     description: "本地转录服务的根地址。默认 http://localhost:8765，如服务运行在其他地址请修改。"
-
-  - key: timeoutMs
-    label: "请求超时（毫秒）"
-    type: number
-    defaultValue: 600000
-    description: "转录请求的超时时间（毫秒），默认 10 分钟（600000）。大文件可适当调大。"
