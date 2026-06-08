@@ -151,16 +151,24 @@ module.exports = async function execute(ctx) {
   ctx.log(`任务已提交 ✓  job_id=${jobId}`)
 
   // Step 3: 轮询进度（无超时上限）
-  let lastStatus = ''
+  let lastStatus   = ''
+  let lastProgress = null
   while (true) {
     await sleep(10000)
     const poll = await req('GET', `${ASR_SERVER}/api/jobs/${jobId}`)
     if (poll.status === 404) throw new Error('任务记录丢失（服务可能已重启），请重新提交')
     const job = poll.body
-    if (job.status !== lastStatus) {
-      if (job.status === 'queued')  ctx.log('状态：排队中...')
-      if (job.status === 'running') ctx.log('状态：正在转录...')
-      lastStatus = job.status
+    const statusChanged   = job.status !== lastStatus
+    const progressChanged = (job.progress || null) !== lastProgress
+    if (statusChanged || progressChanged) {
+      if (job.status === 'queued') {
+        ctx.log('状态：排队中...')
+      } else if (job.status === 'running') {
+        const detail = job.progress ? `正在转录...（${job.progress}）` : '正在转录...'
+        ctx.log(`状态：${detail}`)
+      }
+      lastStatus   = job.status
+      lastProgress = job.progress || null
     }
     if (job.status === 'done') {
       ctx.log(`转录完成 ✓  时长=${job.duration_seconds}s  耗时=${job.elapsed_seconds}s`)
@@ -224,16 +232,24 @@ module.exports = async function execute(ctx) {
   }
 
   ctx.log(`开始轮询任务：${EXISTING_JOB_ID}`)
-  let lastStatus = ''
+  let lastStatus   = ''
+  let lastProgress = null
   while (true) {
     await sleep(10000)
     const poll = await req('GET', `${ASR_SERVER}/api/jobs/${EXISTING_JOB_ID}`)
     if (poll.status === 404) throw new Error('job_id 不存在，服务可能已重启，任务丢失')
     const job = poll.body
-    if (job.status !== lastStatus) {
-      if (job.status === 'queued')  ctx.log('状态：排队中...')
-      if (job.status === 'running') ctx.log('状态：正在转录...')
-      lastStatus = job.status
+    const statusChanged   = job.status !== lastStatus
+    const progressChanged = (job.progress || null) !== lastProgress
+    if (statusChanged || progressChanged) {
+      if (job.status === 'queued') {
+        ctx.log('状态：排队中...')
+      } else if (job.status === 'running') {
+        const detail = job.progress ? `正在转录...（${job.progress}）` : '正在转录...'
+        ctx.log(`状态：${detail}`)
+      }
+      lastStatus   = job.status
+      lastProgress = job.progress || null
     }
     if (job.status === 'done') {
       ctx.log(`转录完成 ✓  时长=${job.duration_seconds}s  耗时=${job.elapsed_seconds}s`)

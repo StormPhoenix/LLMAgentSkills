@@ -74,6 +74,9 @@ tools:
       返回结构：
       - job_id: string
       - status: string
+      - progress: string? — 分片进度（如 "2/5 chunks"），长音频分片任务在 running 期间每完成一片更新一次；
+                            单片任务（短音频）此字段为 null；
+                            任务完成后保留最终值（如 "5/5 chunks"）
       - text: string? — 转录结果（仅 status=done 时存在）
       - duration_seconds: number? — 音频时长（仅 done 时存在）
       - elapsed_seconds: number? — 转录耗时（仅 done 时存在）
