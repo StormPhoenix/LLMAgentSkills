@@ -8,3 +8,26 @@ type:
 autoActivate: false
 peerSkills:
   - file-write
+triggers:
+  - 深度调研
+  - 系统调研
+  - /research
+  - /research-deep
+  - /research-report
+  - 调研报告
+  - 技术选型
+  - 市场分析
+  - 尽职调查
+  - Benchmark对比
+tags:
+  - 调研
+  - 深度
+  - 学术
+  - 分析
+  - 对比
+  - benchmark
+  - 选型
+examples:
+  - 深度调研一下 Rust 在游戏引擎领域的应用
+  - 帮我做 GPU 驱动市场的对比分析
+  - /research AI Agent 框架现在哪家最强

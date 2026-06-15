@@ -6,3 +6,18 @@ category: productivity
 type:
   - skill
 autoActivate: false
+triggers:
+  - 认知调研
+  - 帮我调研
+  - 写一篇调研
+  - 深入了解
+  - /cresearch
+tags:
+  - 调研
+  - 认知
+  - 研究
+  - 写作
+examples:
+  - 帮我调研一下 React 的 SSR 方案
+  - 写一篇关于微服务的认知调研文章
+  - 深入了解 Kubernetes 的调度机制

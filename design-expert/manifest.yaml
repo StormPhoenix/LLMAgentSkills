@@ -6,3 +6,21 @@ category: creativity
 type:
   - skill
 autoActivate: false
+triggers:
+  - 设计风格
+  - UI设计
+  - 做成..风格
+  - 设计系统
+  - 品牌风格
+  - UI风格
+tags:
+  - 设计
+  - UI
+  - 前端
+  - 品牌
+  - 样式
+  - 视觉
+examples:
+  - 帮我做一个苹果风格的后台页面
+  - 参考 GitHub 的设计风格做一个登录页
+  - 有没有类似 Stripe 的设计规范可以参考

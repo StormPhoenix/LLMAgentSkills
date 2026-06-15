@@ -3,6 +3,28 @@ displayName: "本地转录"
 emoji: "🎙️"
 type:
   - skill
+triggers:
+  - 转录
+  - 语音识别
+  - 字幕
+  - 语音转文字
+  - 音视频转文字
+  - 听写
+  - 视频转文字
+  - 音频转文字
+tags:
+  - 转录
+  - 语音
+  - 音频
+  - 视频
+  - 字幕
+  - ASR
+  - 识别
+  - 离线
+examples:
+  - 帮我把这个视频转录成文字
+  - 给这段音频生成字幕文件
+  - 把这个会议录音转成文字
 
 tools:
   - name: transcribe_check_env

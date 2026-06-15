@@ -6,3 +6,20 @@ category: creativity
 type:
   - skill
 autoActivate: false
+triggers:
+  - 知识图谱写作
+  - 概念关系图
+  - 两步写作
+  - 图谱驱动
+  - 先梳理概念再写
+  - 概念梳理
+tags:
+  - 写作
+  - 知识图谱
+  - 结构化
+  - 概念
+  - 逻辑
+  - 认知
+examples:
+  - 帮我用知识图谱的方式写一篇关于分布式系统的文章
+  - 先梳理关键概念再组织成文

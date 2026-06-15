@@ -11,3 +11,23 @@ mcpTools:
   include:
     - image_hunyuan__generate_image
     - image_hunyuan__list_styles
+triggers:
+  - 生成图片
+  - 画图
+  - 文生图
+  - 混元画图
+  - AI画画
+  - 配图
+  - 插图
+  - 生成图像
+tags:
+  - 图片
+  - 图像
+  - 生成
+  - AI绘画
+  - 混元
+  - 文生图
+examples:
+  - 帮我画一张赛博朋克风格的城市夜景
+  - 生成一张中国风的山水风景插画
+  - 给这篇文章配个封面图

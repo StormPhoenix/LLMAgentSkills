@@ -119,7 +119,35 @@ mcpTools:              # 声明本 Skill 依赖的 MCP 工具（可选）
   include:
     - tool_name_1
     - tool_name_2
+triggers:              # 精确匹配触发词（推荐填写，用于自动发现）
+  - 触发词1
+  - 触发词2
+tags:                  # 分类标签（推荐填写，用于模糊匹配）
+  - 标签1
+  - 标签2
+examples:              # 示例问句（推荐填写，用于模糊匹配）
+  - 用户可能这样问的示例
+  - 另一个典型使用场景
 ```
+
+### 自动发现字段：triggers / tags / examples
+
+ToolBox 采用**两阶段匹配**自动发现合适的 Skill，将匹配到的 Skill 注入 `<available_skills>` 供 LLM 按需激活：
+
+| 阶段 | 字段 | 匹配方式 |
+|------|------|---------|
+| **Stage 1（精确）** | `name` + `triggers` | 用户 goal 中是否**包含**这些关键词（子串匹配） |
+| **Stage 2（模糊）** | `triggers` + `tags` + `examples` | Stage 1 无结果时，尝试在用户 goal 中匹配更广泛的词 |
+
+> **重要**：只有 `type: skill` 的 Skill 参与自动发现；`type: persona` 的 Skill 通过角色选择器路径加载，不参与此匹配。
+
+**撰写建议**：
+
+- `triggers`：填写用户提到就会直接触发这个 Skill 的词或短语。尽量覆盖中英文、缩写、口语化表达。例如浏览器自动化 skill 可写 `打开网页`、`自动填表`、`网页截图`。
+- `tags`：填写技能领域的关键词，范围可略宽于 triggers。例如 `浏览器`、`自动化`、`Chrome`、`Playwright`。
+- `examples`：写 2–3 个自然语言问句，模拟用户真实会说的话。例如 `帮我打开淘宝搜索某个商品并截图`。
+
+**如果完全不填写以上字段**，Skill 只有在 `showInIndex: true` 时才会始终出现在 `<available_skills>` 中——大多数外部 Skill 不应设置 `showInIndex: true`（那是内置高频工具的特权），因此**推荐所有 `type: skill` 的 Skill 填写 triggers / tags / examples**。
 
 ---
 
@@ -158,6 +186,7 @@ mcpTools:              # 声明本 Skill 依赖的 MCP 工具（可选）
 
 - `SKILL.md` 中 `description` 字段是 LLM 激活判断的核心依据，**务必简洁精准**
 - `metadata.toolbox.type` **不可省略**，必须为 `skill` 或 `persona` 之一
+- `manifest.yaml` 中建议填写 `triggers` / `tags` / `examples`，以便 ToolBox 自动将 Skill 推荐给 LLM（详见上文"自动发现字段"）
 - Persona 类 Skill 应包含：角色身份、语气约束、核心心智模型、诚实边界
 - Tool 类 Skill 应包含：工具说明、参数表、响应格式、常见使用场景
 - 存在 `manifest.yaml` 时，其 `type` 字段必须与 `SKILL.md` 中 `metadata.toolbox.type` 保持一致，**`manifest.yaml` 中的值优先**
@@ -182,5 +211,6 @@ mcpTools:              # 声明本 Skill 依赖的 MCP 工具（可选）
 - [ ] `metadata.toolbox.type` 已正确填写（`skill` 或 `persona`）
 - [ ] 如有 `manifest.yaml`，其 `type` 字段与 `SKILL.md` 中类型一致
 - [ ] 描述字段清晰说明适用场景和触发条件
+- [ ] **`type: skill` 的 Skill 建议填写 `triggers` / `tags` / `examples`**，以支持 ToolBox 自动发现（见上文"自动发现字段"）
 - [ ] 如有 `.cjs` 脚本，已验证不依赖第三方包
 - [ ] 在本 README 的"现有 Skill 列表"中登记
