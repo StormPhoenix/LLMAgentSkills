@@ -1,0 +1,8 @@
+version: 1.0.0
+skillVersion: 1.0.0
+displayName: 仓库工程知识库构建器
+emoji: 📚
+category: productivity
+type:
+  - skill
+autoActivate: false

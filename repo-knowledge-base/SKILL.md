@@ -1,0 +1,107 @@
+---
+name: repo-knowledge-base
+description: |
+  仓库工程知识库构建器：把任意 Git 仓库梳理成可复用的工程知识库（overview + tech 框架分析 + changelog），并对后续每次 commit 做增量影响分析，决定是否更新文档。
+  触发词：「给 X 仓库建知识库」「梳理这个仓库」「工程知识库」「分析仓库框架设计」「这次 commit 要不要更新文档」「分析 commit 影响」「仓库结构化文档」。
+  适用场景：(1) 首次接入一个中大型项目，需要建立可持续维护的工程知识库；(2) 监控某仓库后续 commit，按影响等级决定是否更新文档；(3) 为 LLM Agent / 桌面应用 / 协议库等代码工程做框架设计分析。
+  局限：不适合纯文档仓库、个人玩具项目、实验性脚本仓库；不替代官方架构文档（而是产出更易于 LLM 检索的二次梳理）。
+metadata:
+  toolbox:
+    type: skill
+---
+
+# 仓库工程知识库构建器
+
+本 Skill 提供一套可复用的方法论与模板，帮助 LLM 给任意中大型代码仓库建立结构化的工程知识库，并对后续更新做增量影响分析。
+
+> **路径说明**：本文件的绝对路径已由系统在 `<location>` 标签中给出。去掉文件名即得到本 Skill 的根目录（base_dir）。下方所有相对路径均以此为基准，使用 `read_text_file` 时请自行拼接完整绝对路径。
+
+## 何时使用本 Skill
+
+- 用户说"帮我给 XX 仓库建立工程知识库" / "梳理这个仓库的功能模块" / "分析仓库框架设计"
+- 用户已建立知识库，问"这次 commit 是否需要更新文档" / "分析 diff 影响"
+- 监控类后台任务收到新 commit 通知，需要判断影响等级
+
+## 核心方法论（必读）
+
+本 Skill 提炼出 **6 条可复用的核心方法论**，所有 workflow 与模板都围绕它们展开：
+
+1. **三色影响等级**（🟢/🟡/🔴）—— 决定 commit 是否触发文档更新
+2. **三列模块索引表**（模块 / 关键路径 / 设计分析）—— overview 的核心结构
+3. **tech 单篇四段式**（设计动机 → 核心抽象 → 优点总结 → 监控信号）—— 框架分析的标准结构
+4. **首扫三阶段**（仓库扫描 → overview 编写 → tech 拆篇）
+5. **changelog 写法规范**（hash + 标题 + 影响等级 + 文档更新动作）
+6. **何时主动深读 diff**（避免一律读全 diff 浪费 token，也避免轻判）
+
+详细规则见 `workflows/` 目录。
+
+## 两种触发路径
+
+### 路径 A：首次建立知识库
+
+触发词：「给 X 仓库建知识库」「梳理这个仓库」
+
+**询问用户的关键信息**（缺一不可）：
+1. 仓库的本地绝对路径（如 `/Users/x/Dev/repo`）
+2. 知识库输出位置（用户指定，本 Skill 不预设默认值）
+3. 仓库简短描述（一句话定位，帮助判断深度）
+
+**执行流程**（依次读取并遵循）：
+- `workflows/01-initial-scan.md` —— 全仓扫描方法论
+- `workflows/02-overview-writing.md` —— overview.md 编写规范
+- `workflows/03-tech-analysis.md` —— tech/ 单篇分析规范
+- 引用 `templates/overview.template.md` 与 `templates/tech-doc.template.md` 作为骨架
+
+**最终产出**：
+```
+<用户指定的知识库目录>/
+├── overview.md
+├── maintenance.md
+├── tech/
+│   └── <module>.md  × N
+└── changelog/
+    └── YYYY-MM.md
+```
+
+### 路径 B：增量更新分析
+
+触发词：「这次 commit 要不要更新文档」「分析 commit 影响」「commit 是否需要同步知识库」
+
+**前提**：知识库已存在，使用者会提供 commit hash / diff / commit message。
+
+**执行流程**：
+- `workflows/04-incremental-update.md` —— commit 影响判定与文档更新方法
+- `workflows/05-changelog-rules.md` —— changelog 写作规则
+- 必要时回到 `workflows/03-tech-analysis.md` 重做某模块的 tech 文档
+
+**输出动作**（择一或组合）：
+- 🟢 低影响 → 仅追加 changelog 一笔
+- 🟡 中影响 → 修改相关 tech 文档对应章节 + changelog
+- 🔴 高影响 → 修改 tech 文档 / 新增 tech 文档 / 必要时更新 overview + changelog
+
+## 工作守则
+
+1. **不臆造**：所有"模块结构""设计动机"必须以源码、官方架构文档、commit 记录为依据；推测时必须明示 "推测"。
+2. **三色判断要保守**：拿不准时上调一级（🟡 优先于 🟢），宁可多更新文档也不漏掉重要变化。
+3. **保持中立**：tech 文档讨论"为什么这样设计、有何优点"，不评价代码作者、不输出主观褒贬。
+4. **对齐已有结构**：增量更新时，新文档段落要与已有 tech 文档的写作风格、缩进、标题层级一致。
+5. **优先官方架构文档**：很多仓库 `docs/architecture/` 已经有官方设计说明，应先读再做二次梳理，不要重复发明。
+
+## 文件索引
+
+```
+SKILL.md                                # 本文件
+workflows/
+  01-initial-scan.md                    # 阶段 1：全仓扫描方法论
+  02-overview-writing.md                # 阶段 2：overview.md 编写规范
+  03-tech-analysis.md                   # 阶段 3：tech/ 单篇分析规范
+  04-incremental-update.md              # 阶段 4：commit 影响分析
+  05-changelog-rules.md                 # 阶段 5：changelog 写作规则
+templates/
+  overview.template.md                  # overview 骨架
+  tech-doc.template.md                  # tech 单篇骨架
+  maintenance.template.md               # maintenance.md 骨架
+  changelog.template.md                 # changelog 月度文件骨架
+```
+
+激活本 Skill 后，按照"路径 A 或 B"读取对应 workflow 文档，并对照模板执行。
