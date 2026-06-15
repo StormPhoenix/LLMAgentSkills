@@ -127,6 +127,7 @@ mcpTools:              # 声明本 Skill 依赖的 MCP 工具（可选）
 
 | 目录 | 类型 | 描述 |
 |------|------|------|
+| `bili-archiver/` | tool | B 站视频下载与归档指引（指引型，无 MCP 工具）；覆盖单次/批量/周期性场景，沉淀 cookies 获取、HTTP 412、分 P 视频、清晰度选择、文件命名等踩坑教训；与 `local-transcribe` 协同完成下载→转录链路 |
 | `hunyuan-image-gen/` | tool | 腾讯混元文生图，12 种预设风格 |
 | `local-transcribe/` | tool | 本地语音/视频转录，支持 mp4/mkv/mp3 等，输出纯文字或 SRT 字幕；通过 configs 配置服务地址 |
 | `女娲-诸葛亮/` | persona | 三国蜀汉丞相诸葛亮思维框架 |

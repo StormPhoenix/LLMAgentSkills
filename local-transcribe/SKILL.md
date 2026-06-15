@@ -56,6 +56,34 @@ metadata:
 | `check_transcribe_job` | 探测任务状态，最多调用一次；或用户主动询问已知 job_id 的进度 |
 | `list_transcribe_jobs` | 用户主动要求查看历史任务时使用 |
 
+## REST API（自定义脚本直连用）
+
+如果你写自定义 Daemon Task 脚本不通过 MCP 工具，而是直接 HTTP 调用 ASR Server，**必须**注意以下要点：
+
+| 端点 | 方法 | 成功状态码 | 返回 body |
+|------|------|------------|-----------|
+| `/api/health` | GET | **200** | `{status, service, model_loaded}` |
+| `/api/jobs` | POST | **202 Accepted**（不是 200！）| `{success, job_id, status: "queued", poll_url}` |
+| `/api/jobs/{job_id}` | GET | **200** | 完整 job 对象（见下） |
+| `/api/jobs` | GET | **200** | `{jobs: [...]}` 全部 job，可用于崩溃恢复查重 |
+
+**HTTP 状态判断准则**：成功条件应写 `status >= 200 && status < 300 && body?.success === true`，**禁止**写 `status === 200`——`POST /api/jobs` 永远返回 202，会被误判为失败导致重复提交。
+
+**job 对象结构**（`GET /api/jobs/{job_id}` 返回）：
+```
+{
+  job_id, status,            // status: queued | running | done | error
+  file_path, output_format, language,
+  submitted_at, started_at, finished_at,
+  duration_seconds,          // 仅 done 时有
+  elapsed_seconds,           // 仅 done 时有
+  language_detected,         // 仅 done 时有
+  text,                      // 仅 done 时有，转录结果
+  error_message,             // 仅 error 时有
+  progress                   // 长音频分片进度，如 "3/84 chunks"
+}
+```
+
 ## 使用场景与操作指引
 
 ### 场景 1：用户要转录一个视频/音频文件（默认路径）
@@ -111,18 +139,25 @@ module.exports = async function execute(ctx) {
   const http = require('http'), https = require('https')
   const fs = require('fs'), path = require('path')
 
+  // HTTP 请求（短超时 15s，仅用于亚秒级元操作；长耗时转录在 ASR 服务端异步进行）
   function req(method, url, body) {
     return new Promise((resolve, reject) => {
       const data = body ? JSON.stringify(body) : null
       const u = new URL(url)
       const mod = u.protocol === 'https:' ? https : http
       const opts = { hostname: u.hostname, port: u.port, path: u.pathname, method,
-        headers: data ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } : {} }
+        headers: data ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } : {},
+        timeout: 15000 }
       const r = mod.request(opts, (res) => {
-        let raw = ''
-        res.on('data', c => raw += c)
-        res.on('end', () => { try { resolve({ status: res.statusCode, body: JSON.parse(raw) }) } catch(e) { reject(e) } })
+        const chunks = []
+        res.on('data', c => chunks.push(c))
+        res.on('end', () => {
+          const raw = Buffer.concat(chunks).toString('utf-8')
+          let parsed; try { parsed = JSON.parse(raw) } catch { parsed = null }
+          resolve({ status: res.statusCode, body: parsed, raw })
+        })
       })
+      r.on('timeout', () => r.destroy(new Error('请求超时')))
       r.on('error', reject)
       if (data) r.write(data)
       r.end()
@@ -136,27 +171,50 @@ module.exports = async function execute(ctx) {
     })
   }
 
+  // 带重试的 GET（轮询用，单次 HTTP 抖动不致命）
+  async function reqWithRetry(method, url, body, retries = 3) {
+    let lastErr = null
+    for (let i = 0; i < retries; i++) {
+      try { return await req(method, url, body) }
+      catch (e) {
+        lastErr = e
+        if (i < retries - 1) {
+          ctx.log(`[warn] HTTP 异常 (${e.message})，${i+1}/${retries} 重试...`)
+          await sleep(5000)
+        }
+      }
+    }
+    throw lastErr
+  }
+
   // Step 1: 检查服务
   ctx.log('检查 ASR Server...')
   const health = await req('GET', `${ASR_SERVER}/api/health`)
-  if (!health.body.model_loaded) throw new Error('ASR 模型未加载，请先启动服务')
+  if (health.status !== 200 || !health.body?.model_loaded) {
+    throw new Error(`ASR 模型未加载，请先启动服务（HTTP ${health.status}）`)
+  }
   ctx.log('服务就绪 ✓')
 
   // Step 2: 提交任务
   if (!fs.existsSync(FILE_PATH)) throw new Error(`文件不存在：${FILE_PATH}`)
   ctx.log(`提交转录任务：${FILE_PATH}`)
   const submit = await req('POST', `${ASR_SERVER}/api/jobs`, { file_path: FILE_PATH, output_format: OUTPUT_FORMAT, language: LANGUAGE })
-  if (!submit.body.success) throw new Error(`提交失败：${submit.body.error}`)
+  // 关键：POST /api/jobs 返回 HTTP 202（不是 200），用区间判断
+  const submitOk = submit.status >= 200 && submit.status < 300 && submit.body?.success === true
+  if (!submitOk) {
+    throw new Error(`提交失败 HTTP ${submit.status}: ${submit.body?.error || submit.raw?.slice(0, 200)}`)
+  }
   const jobId = submit.body.job_id
-  ctx.log(`任务已提交 ✓  job_id=${jobId}`)
+  ctx.log(`任务已提交 ✓  job_id=${jobId} (HTTP ${submit.status})`)
 
-  // Step 3: 轮询进度（无超时上限）
+  // Step 3: 轮询进度（无超时上限，HTTP 抖动自动重试）
   let lastStatus   = ''
   let lastProgress = null
   while (true) {
     await sleep(10000)
-    const poll = await req('GET', `${ASR_SERVER}/api/jobs/${jobId}`)
+    const poll = await reqWithRetry('GET', `${ASR_SERVER}/api/jobs/${jobId}`)
     if (poll.status === 404) throw new Error('任务记录丢失（服务可能已重启），请重新提交')
+    if (poll.status !== 200 || !poll.body) throw new Error(`轮询异常 HTTP ${poll.status}`)
     const job = poll.body
     const statusChanged   = job.status !== lastStatus
     const progressChanged = (job.progress || null) !== lastProgress
@@ -214,11 +272,16 @@ module.exports = async function execute(ctx) {
     return new Promise((resolve, reject) => {
       const u = new URL(url)
       const mod = u.protocol === 'https:' ? https : http
-      const r = mod.request({ hostname: u.hostname, port: u.port, path: u.pathname, method }, (res) => {
-        let raw = ''
-        res.on('data', c => raw += c)
-        res.on('end', () => { try { resolve({ status: res.statusCode, body: JSON.parse(raw) }) } catch(e) { reject(e) } })
+      const r = mod.request({ hostname: u.hostname, port: u.port, path: u.pathname, method, timeout: 15000 }, (res) => {
+        const chunks = []
+        res.on('data', c => chunks.push(c))
+        res.on('end', () => {
+          const raw = Buffer.concat(chunks).toString('utf-8')
+          let parsed; try { parsed = JSON.parse(raw) } catch { parsed = null }
+          resolve({ status: res.statusCode, body: parsed, raw })
+        })
       })
+      r.on('timeout', () => r.destroy(new Error('请求超时')))
       r.on('error', reject)
       r.end()
     })
@@ -231,13 +294,30 @@ module.exports = async function execute(ctx) {
     })
   }
 
+  // 带重试的 GET（轮询用，HTTP 抖动不致命）
+  async function reqWithRetry(method, url, retries = 3) {
+    let lastErr = null
+    for (let i = 0; i < retries; i++) {
+      try { return await req(method, url) }
+      catch (e) {
+        lastErr = e
+        if (i < retries - 1) {
+          ctx.log(`[warn] HTTP 异常 (${e.message})，${i+1}/${retries} 重试...`)
+          await sleep(5000)
+        }
+      }
+    }
+    throw lastErr
+  }
+
   ctx.log(`开始轮询任务：${EXISTING_JOB_ID}`)
   let lastStatus   = ''
   let lastProgress = null
   while (true) {
     await sleep(10000)
-    const poll = await req('GET', `${ASR_SERVER}/api/jobs/${EXISTING_JOB_ID}`)
+    const poll = await reqWithRetry('GET', `${ASR_SERVER}/api/jobs/${EXISTING_JOB_ID}`)
     if (poll.status === 404) throw new Error('job_id 不存在，服务可能已重启，任务丢失')
+    if (poll.status !== 200 || !poll.body) throw new Error(`轮询异常 HTTP ${poll.status}`)
     const job = poll.body
     const statusChanged   = job.status !== lastStatus
     const progressChanged = (job.progress || null) !== lastProgress
@@ -290,3 +370,31 @@ cd /path/to/McpServerManager/servers/qwen-asr
 - 输出格式：`txt`（纯文字，适合阅读）、`srt`（含时间戳，适合字幕）
 - Job 记录持久化于 `~/.mcp-server-manager/qwen-asr/jobs/`，服务重启后历史 done/error 任务仍可查询
 - 最多保留最近 50 条已完成任务，超出后自动清理最旧记录
+
+## 自定义脚本踩坑指南（实战教训）
+
+如果你不用上面的标准模板而是写自定义脚本，以下是已被实战验证的关键陷阱：
+
+### 陷阱 1：HTTP 状态码判断错误
+
+`POST /api/jobs` 返回 **HTTP 202 Accepted**，**不是** 200。错误代码 `if (status !== 200)` 会把所有提交判为失败，导致：
+- 误报“提交失败”
+- 单条 catch 后跳到下一条，连续提交多条 → 服务端排起一长队
+- 主流程以为没提交成功，**不写状态文件、不轮询**，但 ASR 实际已开始转录 → 结果 txt 永远不会被写入
+
+**正确写法**：`if (status >= 200 && status < 300 && body?.success === true)`
+
+### 陷阱 2：批量场景的崩溃恢复
+
+如果你为多个文件批量提交，建议在 seen.json / 状态文件中持久化每条的 `asr_job_id`。这样脚本崩溃重启后能：
+1. 先用 `GET /api/jobs/{saved_job_id}` 检查保存的 job 是否还在 `queued/running` → 直接接续轮询
+2. 再用 `GET /api/jobs` 列出所有进行中 job，按 `file_path` 匹配查重 → 复用而非重复提交
+3. 都没找到才提交新 job
+
+### 陷阱 3：HTTP 超时设置
+
+所有 ASR API 都是亚秒级返回的元操作（health / submit / poll），实际转录在服务端异步进行。15s HTTP 超时绰绰有余。**不要**为了“等转录完成”而把 HTTP 超时调到几小时——这毫无意义，因为 API 本身从不阻塞等待转录结果。
+
+### 陷阱 4：轮询间隔抖动
+
+偶发的 HTTP timeout/refuse 会让单次轮询失败。如果直接 throw 会让一个 90 分钟的转录在第 88 分钟功亏一簔。**轮询应带 3 次重试**（间隔 5 秒），否则 ASR 实际跑完了你也拿不到结果。
