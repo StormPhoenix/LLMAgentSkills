@@ -11,3 +11,25 @@ mcpTools:
   include:
     - image_jimeng__text_to_image
     - image_jimeng__image_to_image
+triggers:
+  - 生成图片
+  - 画图
+  - 图生图
+  - 参考图生成
+  - 改图
+  - 即梦
+  - AI配图
+  - 改图片
+  - 修改图片
+  - 图片变风格
+tags:
+  - 图片
+  - 图像
+  - 生成
+  - AI绘画
+  - 即梦
+  - 图生图
+examples:
+  - 基于这张照片帮我生成一个动漫风格的头像
+  - 帮我把这个草稿变成一张精美的插画
+  - 把这张图片改成水墨画风格

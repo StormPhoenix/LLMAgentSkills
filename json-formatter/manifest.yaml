@@ -1,6 +1,20 @@
 version: "1.0.0"
 displayName: "JSON 格式化"
 emoji: "🗂️"
+triggers:
+  - 格式化json
+  - json格式化
+  - json美化
+  - 整理json
+  - json缩进
+tags:
+  - json
+  - 格式化
+  - 工具
+  - 数据处理
+examples:
+  - 帮我把这个json文件格式化一下
+  - 把这个配置文件用4空格缩进
 
 tools:
   - name: format_json_file

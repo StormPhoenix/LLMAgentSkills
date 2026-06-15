@@ -1,6 +1,24 @@
 version: "1.0.0"
 displayName: "Markdown 转 PDF"
 emoji: "📄"
+triggers:
+  - md转pdf
+  - markdown转pdf
+  - 导出pdf
+  - 生成pdf
+  - 转成PDF
+  - 文档转PDF
+tags:
+  - markdown
+  - pdf
+  - 转换
+  - 导出
+  - 文档
+  - 格式化
+examples:
+  - 帮我把这个markdown文件转成PDF
+  - 把report.md导出为PDF
+  - 把这个文档转成PDF格式
 
 tools:
   - name: convert_md_to_pdf

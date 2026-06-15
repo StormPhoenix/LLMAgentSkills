@@ -6,3 +6,23 @@ category: creativity
 type:
   - skill 
 autoActivate: false
+triggers:
+  - 技术调研
+  - 深度技术文章
+  - 技术写作
+  - 撰写技术报告
+  - 写一篇技术文章
+  - 技术深度分析
+  - 技术剖析
+tags:
+  - 技术
+  - 写作
+  - 调研
+  - 深度
+  - 报告
+  - 学术
+  - 专业
+examples:
+  - 帮我写一篇关于 WebAssembly 的技术调研文章
+  - 撰写一份微服务架构的深度分析报告
+  - 写一篇 React Server Components 的技术剖析
