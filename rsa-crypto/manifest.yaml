@@ -1,0 +1,180 @@
+version: "1.0.0"
+emoji: "🔐"
+displayName: "RSA 加密工具"
+
+triggers:
+  - 加密
+  - 解密
+  - encrypt
+  - decrypt
+  - RSA
+  - rsa
+  - 加密字符串
+  - 解密字符串
+  - 加密文件
+  - 解密文件
+  - 密钥
+  - 生成密钥
+
+tags:
+  - 加密
+  - 解密
+  - RSA
+  - AES
+  - 密码学
+  - 安全
+  - crypto
+  - 密钥管理
+
+examples:
+  - 帮我加密这段密码
+  - 把这个字符串用RSA加密一下
+  - 解密这段Base64密文
+  - 帮我把桌面上的config.json加密
+  - 我需要生成一个新的RSA密钥对
+  - 列出我现有的加密密钥
+
+configs:
+  - key: defaultKeyId
+    label: 默认密钥 ID
+    type: string
+    defaultValue: "builtin-default"
+    description: >
+      加密/解密时不指定 keyId 时使用的默认密钥 ID。
+      可通过 rsa_list_keys 工具查看所有可用密钥的 ID。
+      初始值为内置密钥 builtin-default。
+
+  - key: defaultKeyBits
+    label: 生成密钥位数
+    type: select
+    defaultValue: "2048"
+    description: >
+      使用 rsa_generate_keypair 生成密钥对时的默认位数。
+      2048 位适用于一般用途，4096 位更安全但较慢。
+    options:
+      - label: 2048 位（标准）
+        value: "2048"
+      - label: 4096 位（高安全）
+        value: "4096"
+
+tools:
+  - name: rsa_list_keys
+    displayName: "列出 RSA 密钥"
+    description: |
+      列出所有已保存的 RSA 密钥条目。返回数组，每项包含 id、name、type(pair/public/private)、bits、createdAt、isBuiltin。
+      用于查看可用密钥以便后续加密/解密时选择。
+    inputSchema:
+      type: object
+      properties: {}
+      required: []
+    riskLevel: SAFE
+    capabilities: [crypto]
+    scriptEntry: scripts/rsa-crypto.cjs
+
+  - name: rsa_encrypt_text
+    displayName: "RSA 加密字符串"
+    description: |
+      使用 RSA 混合加密（AES-256-GCM + RSA-OAEP）加密一段明文字符串。
+      返回 Base64 编码的密文。无明文长度限制。
+      keyId 可选，不传则使用用户配置的默认密钥。
+    inputSchema:
+      type: object
+      properties:
+        plaintext:
+          type: string
+          description: 要加密的明文字符串
+        keyId:
+          type: string
+          description: 用于加密的密钥 ID（需有公钥）。可选，默认使用配置的默认密钥。
+      required: [plaintext]
+    riskLevel: SAFE
+    capabilities: [crypto]
+    scriptEntry: scripts/rsa-crypto.cjs
+
+  - name: rsa_decrypt_text
+    displayName: "RSA 解密字符串"
+    description: |
+      使用 RSA 混合解密还原 Base64 密文为原始明文字符串。
+      输入必须是 rsa_encrypt_text 产生的 Base64 密文。
+      keyId 可选，不传则使用用户配置的默认密钥。
+    inputSchema:
+      type: object
+      properties:
+        cipherBase64:
+          type: string
+          description: Base64 编码的密文（由 rsa_encrypt_text 产生）
+        keyId:
+          type: string
+          description: 用于解密的密钥 ID（需有私钥）。可选，默认使用配置的默认密钥。
+      required: [cipherBase64]
+    riskLevel: SAFE
+    capabilities: [crypto]
+    scriptEntry: scripts/rsa-crypto.cjs
+
+  - name: rsa_generate_keypair
+    displayName: "生成 RSA 密钥对"
+    description: |
+      生成新的 RSA 密钥对并持久化保存。
+      返回创建的密钥条目信息。bits 可选，默认使用用户配置值。
+    inputSchema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 密钥对的名称（便于识别）
+        bits:
+          type: number
+          description: 密钥长度，2048 或 4096。可选，默认使用配置值。
+      required: [name]
+    riskLevel: MODERATE
+    confirmHint: "生成 RSA 密钥对: {name}"
+    capabilities: [crypto]
+    scriptEntry: scripts/rsa-crypto.cjs
+
+  - name: rsa_encrypt_file
+    displayName: "RSA 加密文件"
+    description: |
+      使用 RSA 混合加密对文件进行加密，输出 .enc 文件。
+      inputPath 为源文件路径，outputPath 为输出路径（可选，默认在源文件后追加 .enc）。
+      禁止操作系统目录，文件大小限制 50MB。
+    inputSchema:
+      type: object
+      properties:
+        inputPath:
+          type: string
+          description: 要加密的源文件绝对路径
+        outputPath:
+          type: string
+          description: 加密输出文件路径。可选，默认为 inputPath + '.enc'
+        keyId:
+          type: string
+          description: 用于加密的密钥 ID（需有公钥）。可选，默认使用配置的默认密钥。
+      required: [inputPath]
+    riskLevel: MODERATE
+    confirmHint: "加密文件: {inputPath}"
+    capabilities: [crypto, file-system]
+    scriptEntry: scripts/rsa-crypto.cjs
+
+  - name: rsa_decrypt_file
+    displayName: "RSA 解密文件"
+    description: |
+      使用 RSA 混合解密还原加密文件为原始文件。
+      inputPath 为 .enc 加密文件路径，outputPath 为输出路径（可选，默认去掉 .enc 后缀）。
+      禁止操作系统目录，文件大小限制 50MB。
+    inputSchema:
+      type: object
+      properties:
+        inputPath:
+          type: string
+          description: 要解密的 .enc 文件绝对路径
+        outputPath:
+          type: string
+          description: 解密输出文件路径。可选，默认为去掉 .enc 后缀
+        keyId:
+          type: string
+          description: 用于解密的密钥 ID（需有私钥）。可选，默认使用配置的默认密钥。
+      required: [inputPath]
+    riskLevel: MODERATE
+    confirmHint: "解密文件: {inputPath}"
+    capabilities: [crypto, file-system]
+    scriptEntry: scripts/rsa-crypto.cjs
