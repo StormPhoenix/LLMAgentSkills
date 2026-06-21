@@ -1,0 +1,65 @@
+version: "1.0.0"
+displayName: "Excel 工具"
+emoji: "📊"
+alwaysCandidate: false
+triggers:
+  - Excel
+  - xlsx
+  - .xlsx
+  - 表格
+  - 电子表格
+  - 创建excel
+  - 读取excel
+tags:
+  - excel
+  - 表格
+  - 数据
+  - 分析
+  - 创建
+  - 阅读
+examples:
+  - 帮我创建一个Excel表格
+  - 读取这个xlsx文件
+  - 帮我分析这份表格数据
+
+tools:
+  - name: read_xlsx
+    description: |
+      读取 Excel 文件（.xlsx）的文本内容。
+    inputSchema:
+      type: object
+      properties:
+        filePath:
+          type: string
+          description: XLSX 文件的绝对路径
+        pages:
+          type: string
+          description: |
+            段落范围："1-50" 读取前50段，"all" 读取全部（默认）
+      required:
+        - filePath
+    riskLevel: SAFE
+    scriptEntry: scripts/read-xlsx.cjs
+
+  - name: create_xlsx
+    description: |
+      从结构化数据创建 Excel 文件（.xlsx）。
+      data 参数为二维数组，第一行作为表头。
+      例：[["姓名", "年龄"], ["张三", 25], ["李四", 30]]
+    inputSchema:
+      type: object
+      properties:
+        filePath:
+          type: string
+          description: 输出 XLSX 文件的绝对路径
+        data:
+          type: array
+          description: 二维数组，第一行为表头，后续行为数据
+          items:
+            type: array
+            items: {}
+      required:
+        - filePath
+        - data
+    riskLevel: MODERATE
+    scriptEntry: scripts/create-xlsx.cjs

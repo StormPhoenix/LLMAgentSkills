@@ -1,0 +1,39 @@
+version: "1.0.0"
+displayName: "PDF 工具"
+emoji: "📕"
+alwaysCandidate: false
+triggers:
+  - PDF
+  - pdf
+  - .pdf
+  - 读取pdf
+  - pdf文档
+tags:
+  - pdf
+  - 文档
+  - 阅读
+  - 提取
+examples:
+  - 帮我读取这个PDF文件
+  - 读取PDF的前几页
+  - 总结这个PDF文档的内容
+
+tools:
+  - name: read_pdf
+    description: |
+      读取 PDF 文件的文本内容。支持按页范围分段读取。
+      对于大文档，建议先用 pages: "1-10" 读取开头了解结构。
+    inputSchema:
+      type: object
+      properties:
+        filePath:
+          type: string
+          description: PDF 文件的绝对路径
+        pages:
+          type: string
+          description: |
+            页码范围："1-10" 读取第1到10页，"5" 读取第5页，"all" 读取全部（默认）
+      required:
+        - filePath
+    riskLevel: SAFE
+    scriptEntry: scripts/read-pdf.cjs

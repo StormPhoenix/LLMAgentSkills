@@ -165,6 +165,9 @@ ToolBox 采用**两阶段匹配**自动发现合适的 Skill，将匹配到的 S
 | `maqianzu/` | skill | 马前卒 / 睡前消息结构化分析框架，含本地知识库（topics + episodes） |
 | `tech-writing-expert/` | persona | 深度技术调研写作专家，强制散文体，五阶段认知路径，禁用碎片化列表 |
 | `knowledge-graph-writer/` | persona | 知识图谱驱动写作法，两步流程：先生成概念逻辑关系图，再按图谱拓扑顺序撰写连贯文章 |
+| `pdf-tools/` | skill | PDF 文件读取，支持按页范围分段读取；适用于文档阅读与信息提取 |
+| `docx-tools/` | skill | Word 文档（.docx）读取与创建；支持按段落分段读取，以及从 Markdown 生成新文档 |
+| `xlsx-tools/` | skill | Excel 电子表格（.xlsx）读取与创建；支持读取表格数据，以及从二维数组生成新表格 |
 
 ---
 
