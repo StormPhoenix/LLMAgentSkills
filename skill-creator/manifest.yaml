@@ -1,0 +1,35 @@
+version: "1.0.0"
+displayName: "Skill 创作向导"
+emoji: "🧙"
+category: utility
+type:
+  - skill
+autoActivate: false
+triggers:
+  - 创建Skill
+  - 写一个Skill
+  - 自定义Skill
+  - 新增技能
+  - 帮我做一个工具
+  - 写个Skill
+  - skill创作
+  - 创建技能
+  - 制作Skill
+  - 新建Skill
+  - 写个技能包
+  - 自定义工具
+  - 编写Skill
+tags:
+  - Skill
+  - 技能
+  - 创作
+  - 工具
+  - 向导
+  - 自定义
+  - 扩展
+  - 教学
+  - 元技能
+examples:
+  - 帮我创建一个天气预报的 Skill
+  - 我想写一个角色扮演的 Skill，扮演苏格拉底
+  - 新增一个图片压缩的工具型 Skill
