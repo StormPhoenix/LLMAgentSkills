@@ -1,0 +1,83 @@
+version: "1.0.0"
+emoji: "🔤"
+displayName: 文本处理工具箱
+category: utility
+type:
+  - skill
+autoActivate: false
+
+triggers:
+  - JSON 格式化
+  - Base64
+  - URL 编码
+  - URL 解码
+  - 哈希
+  - hash
+  - md5
+  - sha256
+  - 字数统计
+  - 正则
+  - UUID
+  - 大小写转换
+  - camelCase
+  - snake_case
+tags:
+  - 文本处理
+  - 编码解码
+  - 格式化
+  - 开发工具
+examples:
+  - 帮我格式化这段 JSON
+  - 把这段文字 Base64 编码
+  - 统计一下这段文字的字数
+
+tools:
+  - name: text_transform
+    displayName: "文本处理"
+    description: |
+      文本处理瑞士军刀，支持多种常用文本操作：
+
+      action 可选值：
+      - format_json: 格式化或压缩 JSON。参数: input, indent(默认2), compress(bool,压缩模式)
+      - base64_encode: Base64 编码。参数: input
+      - base64_decode: Base64 解码。参数: input
+      - url_encode: URL 编码。参数: input
+      - url_decode: URL 解码。参数: input
+      - hash: 计算哈希值。参数: input, algorithm(md5/sha256/sha512，默认md5)
+      - word_count: 统计字数/词数/行数/字符数。参数: input
+      - regex_extract: 正则提取匹配内容。参数: input, pattern, flags(默认"g")
+      - uuid: 生成 UUID v4。无需 input 参数
+      - case_convert: 大小写/命名风格转换。参数: input, to(upper/lower/capitalize/camel/snake/kebab)
+
+      SAFE 级别工具，无需确认弹窗。
+    inputSchema:
+      type: object
+      properties:
+        action:
+          type: string
+          description: "操作类型: format_json | base64_encode | base64_decode | url_encode | url_decode | hash | word_count | regex_extract | uuid | case_convert"
+        input:
+          type: string
+          description: 要处理的文本内容
+        indent:
+          type: number
+          description: "JSON 缩进空格数（format_json 时使用），默认 2"
+        compress:
+          type: boolean
+          description: "是否压缩 JSON（format_json 时使用），默认 false"
+        algorithm:
+          type: string
+          description: "哈希算法（hash 时使用）: md5 | sha256 | sha512，默认 md5"
+        pattern:
+          type: string
+          description: "正则表达式（regex_extract 时使用）"
+        flags:
+          type: string
+          description: "正则标志（regex_extract 时使用），默认 g"
+        to:
+          type: string
+          description: "目标格式（case_convert 时使用）: upper | lower | capitalize | camel | snake | kebab"
+      required: [action]
+    riskLevel: SAFE
+    capabilities: [text-transform]
+    scriptEntry: scripts/text-transform.cjs

@@ -169,6 +169,7 @@ ToolBox 采用**两阶段匹配**自动发现合适的 Skill，将匹配到的 S
 | `docx-tools/` | skill | Word 文档（.docx）读取与创建；支持按段落分段读取，以及从 Markdown 生成新文档 |
 | `xlsx-tools/` | skill | Excel 电子表格（.xlsx）读取与创建；支持读取表格数据，以及从二维数组生成新表格 |
 | `skill-creator/` | skill | ToolBox Skill 创作向导；指导用户从零编写符合规范的 Skill（SKILL.md + manifest.yaml + .cjs 脚本），覆盖工具型（skill）与角色型（persona）两种类型 |
+| `text-transform/` | skill | 文本处理工具箱：JSON 格式化、Base64 编解码、URL 编解码、哈希计算、字数统计、正则提取、UUID 生成、大小写转换；全部 SAFE 级别 |
 
 ### 在 ToolBox 中加载
 
