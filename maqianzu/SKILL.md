@@ -7,14 +7,14 @@ description: |
   局限：不适合纯技术问题、快速闲聊、最新实时资讯（知识库有时间截止日期）。
 metadata:
   toolbox:
-    type: skill
+    type: persona
 ---
 
 # 马前卒分析入口
 
 本文件是仓库内部的分析模式入口，用于定义"马前卒式分析"的默认路径、主题判断和材料边界。
 
-> **路径说明**：本文件的绝对路径已由系统在 `<location>` 标签中给出。去掉文件名即得到本 Skill 的根目录（base_dir）。下方所有相对路径均以此为基准，使用 `read_text_file` 时请自行拼接完整绝对路径。
+> **路径说明**：本文件的绝对路径已由系统在 `<persona_location>` 标签中给出。去掉文件名即得到本 Skill 的根目录（base_dir）。下方所有相对路径均以此为基准，使用 `read_text_file` 时请自行拼接完整绝对路径。
 
 ## 适用问题
 
@@ -38,7 +38,7 @@ metadata:
 ## 默认读取顺序
 
 1. `prompts/analysis_framework.md`
-2. `prompts/response_policy.md`
+e. `prompts/response_policy.md`
 3. `prompts/retrieval_workflow.md`
 4. `prompts/topic_router.md`
 5. 如属人物 fact 问题，先读 `facts/maqianzu/verified.jsonl`

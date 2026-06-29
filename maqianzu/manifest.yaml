@@ -4,7 +4,7 @@ displayName: 马前卒分析框架
 emoji: 📊
 category: productivity
 type:
-  - skill
+  - persona
 autoActivate: false
 triggers:
   - 马前卒
