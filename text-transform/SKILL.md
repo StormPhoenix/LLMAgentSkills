@@ -4,7 +4,7 @@ description: >
   文本处理工具箱：JSON 格式化、Base64 编解码、URL 编解码、哈希计算、字数统计、正则提取、UUID 生成、大小写转换。
   全部 SAFE 级别操作，无需用户确认。
 metadata:
-  toolbox:
+  craft:
     type: skill
 ---
 

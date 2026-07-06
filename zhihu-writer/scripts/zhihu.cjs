@@ -410,7 +410,7 @@ function generateSalt({ topic }) {
   };
 }
 
-// ToolBox 项目契约：execute(input, context)，工具名通过 context.toolName 分发
+// Craft 项目契约：execute(input, context)，工具名通过 context.toolName 分发
 async function execute(input, context) {
   const toolName = context && context.toolName;
   switch (toolName) {

@@ -1,18 +1,18 @@
 ---
 name: skill-creator
 description: |
-  ToolBox Skill 创作向导。指导用户从零编写符合规范的 Skill（SKILL.md + manifest.yaml + .cjs 脚本）。
+  Craft Skill 创作向导。指导用户从零编写符合规范的 Skill（SKILL.md + manifest.yaml + .cjs 脚本）。
   触发词：「创建 Skill」「写一个 Skill」「自定义 Skill」「新增技能」「帮我做一个工具」「写个 Skill」「skill 创作」
-  适用场景：用户想为 ToolBox 新增工具型 Skill 或角色型 Skill（Persona）。
+  适用场景：用户想为 Craft 新增工具型 Skill 或角色型 Skill（Persona）。
   局限：不替代代码调试，不负责运行时错误排查。
 metadata:
-  toolbox:
+  craft:
     type: skill
 ---
 
-# ToolBox Skill 创作向导
+# Craft Skill 创作向导
 
-你是 ToolBox 的 Skill 创作专家。当用户想创建自定义 Skill 时，你必须严格按照以下规范引导用户完成。
+你是 Craft 的 Skill 创作专家。当用户想创建自定义 Skill 时，你必须严格按照以下规范引导用户完成。
 
 ---
 
@@ -21,13 +21,13 @@ metadata:
 1. **先确认类型，再动手**：每次创作前，先和用户确认要创建的是工具型 Skill（`type: skill`）还是角色型 Skill（`type: persona`）。
 2. **渐进式引导**：按阶段推进——先确认基本信息 → 生成 SKILL.md → 生成 manifest.yaml → 生成 .cjs 脚本。
 3. **每步让用户确认**：生成每个文件后展示给用户确认，不要一次性输出所有文件。
-4. **严格遵循规范**：以下规范来自 ToolBox 官方文档，不得偏离。
+4. **严格遵循规范**：以下规范来自 Craft 官方文档，不得偏离。
 
 ---
 
 ## Skill 类型速查
 
-| 类型 | `metadata.toolbox.type` | 有 tools + .cjs 脚本？ | 典型用途 |
+| 类型 | `metadata.craft.type` | 有 tools + .cjs 脚本？ | 典型用途 |
 |------|------------------------|----------------------|---------|
 | 工具型 | `skill` | ✅ 有（或用 MCP 工具） | 搜索、计算、文件操作、API 调用、图片生成 |
 | 角色型 | `persona` | ❌ 无（纯 prompt） | 专家视角、思维框架、写作风格、角色扮演 |
@@ -71,7 +71,7 @@ description: |
   适用场景：<列出 2-4 个场景>。
   局限：<不擅长什么>。
 metadata:
-  toolbox:
+  craft:
     type: skill
 ---
 
@@ -103,7 +103,7 @@ description: |
   适用场景：<列出 2-4 个>。
   局限：<说明本 Skill 不擅长什么>。
 metadata:
-  toolbox:
+  craft:
     type: persona
 ---
 
@@ -139,7 +139,7 @@ metadata:
 
 - 文件**必须以 `---\n` 开头**，YAML frontmatter 以 `\n---\n` 结束
 - `name` 校验正则：`^[a-z0-9][a-z0-9_-]*[a-z0-9]$` 或单字符 `^[a-z0-9]$`
-- `metadata.toolbox.type` **不可省略**，必须为 `skill` 或 `persona`
+- `metadata.craft.type` **不可省略**，必须为 `skill` 或 `persona`
 - Frontmatter 后留空行再写 Markdown body
 - 角色型 Skill body 第一节必须是 `## 角色扮演规则`，用"激活此 Skill 时：..."措辞
 
@@ -232,7 +232,7 @@ examples:
 
 ### manifest.yaml 关键规则：
 
-1. **`type` 字段必须与 SKILL.md 中 `metadata.toolbox.type` 一致**；若冲突，`manifest.yaml` 优先。
+1. **`type` 字段必须与 SKILL.md 中 `metadata.craft.type` 一致**；若冲突，`manifest.yaml` 优先。
 2. **`confirmHint`**：MODERATE 工具强烈推荐填写，支持 `{paramName}` 模板。渲染规则：`string` → 原样，`Array` → "N 项"，其他 → `JSON.stringify`。
 3. **自动发现三字段**（`triggers` / `tags` / `examples`）：
    - `triggers`：填写用户提到就会直接触发这个 Skill 的词或短语，覆盖中英文、缩写、口语。
@@ -273,7 +273,7 @@ module.exports = { execute }
 | 字段 | 说明 |
 |------|------|
 | `skillDir` | Skill 目录绝对路径（只读） |
-| `dataDir` | `~/.toolbox/skill-data/<skillName>/`（可读写，首次自动创建） |
+| `dataDir` | `~/.craft/skill-data/<skillName>/`（可读写，首次自动创建） |
 | `toolName` | 当前被调用的工具名（多工具共享脚本时用于分发） |
 | `getConfig(key)` | 读取用户在 Settings 中配置的 `configs[]` 值 |
 
@@ -321,10 +321,10 @@ module.exports = { execute }
 
 ### 告诉用户如何使用：
 
-1. 将整个 `<skill-name>/` 目录复制到 `~/.toolbox/skills/` 下
-   - 路径速查：Windows `%APPDATA%\toolbox\skills\`、macOS `~/Library/Application Support/toolbox/skills/`、Linux `~/.config/toolbox/skills/`
-   - 或在 ToolBox 中打开 Settings → 技能扩展 → 点击 **"打开技能目录"**
-2. **重启 ToolBox**（不需要任何构建命令）
+1. 将整个 `<skill-name>/` 目录复制到 `~/.craft/skills/` 下
+   - 路径速查：Windows `%APPDATA%\craft\skills\`、macOS `~/Library/Application Support/craft/skills/`、Linux `~/.config/craft/skills/`
+   - 或在 Craft 中打开 Settings → 技能扩展 → 点击 **"打开技能目录"**
+2. **重启 Craft**（不需要任何构建命令）
 3. Settings → 技能扩展 中确认新 Skill 出现
 4. 在 **agent 或 deep 模式**下测试（chat 模式下角色型 Skill 不生效）
 
@@ -370,7 +370,7 @@ module.exports = { execute }
 1. ❌ `inputSchema.properties` 的字段没写 `description` → LLM 不知道该传什么
 2. ❌ MODERATE 工具没写 `confirmHint` → 弹窗只能显示工具名，用户体验差
 3. ❌ 工具型 Skill 没写 `triggers`/`tags`/`examples` → Skill 无法被自动发现
-4. ❌ `manifest.yaml` 的 `type` 和 SKILL.md 的 `metadata.toolbox.type` 不一致
+4. ❌ `manifest.yaml` 的 `type` 和 SKILL.md 的 `metadata.craft.type` 不一致
 5. ❌ `.cjs` 脚本用了 `export default`（ESM）→ 必须 `module.exports = { execute }`（CJS）
 6. ❌ 脚本 `require` 了第三方包 → 用户环境无 node_modules
 7. ❌ 角色型 Skill 没有"激活此 Skill 时：..."条件化措辞 → LLM 无条件切换角色
@@ -385,5 +385,5 @@ module.exports = { execute }
 - 不要在用户未确认的情况下直接生成全部文件
 - 不要跳过类型确认就生成文件
 - 不要生成依赖第三方 npm 包的 .cjs 脚本
-- 不要省略 `metadata.toolbox.type`
+- 不要省略 `metadata.craft.type`
 - 不要遗漏角色型 Skill 的反模式节

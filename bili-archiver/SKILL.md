@@ -6,7 +6,7 @@ description: >
   周期性监控三类场景，沉淀 B 站特有的踩坑教训（HTTP 412、分 P 视频、清晰度选择、
   cookies 获取等）。本 Skill 不实现转录逻辑，需要转录时协同 local-transcribe Skill。
 metadata:
-  toolbox:
+  craft:
     type: skill
 ---
 
@@ -48,7 +48,7 @@ metadata:
 
 ```bash
 yt-dlp --cookies-from-browser chrome \
-       --cookies ~/.toolbox/bili_cookies.txt \
+       --cookies ~/.craft/bili_cookies.txt \
        --skip-download \
        "https://www.bilibili.com/video/BV1xx411c7mD"
 ```
@@ -56,10 +56,10 @@ yt-dlp --cookies-from-browser chrome \
 执行要点（必须告知用户）：
 
 - ⚠️ **macOS 首次执行会弹钥匙串授权弹窗**，必须点"始终允许"，否则脚本无法读取
-- ⚠️ AI 通过 ToolBox 的 shell 工具执行此命令**通常无法触发 GUI 授权弹窗**——
+- ⚠️ AI 通过 Craft 的 shell 工具执行此命令**通常无法触发 GUI 授权弹窗**——
   让用户自己在终端跑这一条
 - `--skip-download` 表示只导出 cookies、不下载视频
-- 后续所有 yt-dlp 命令都用 `--cookies ~/.toolbox/bili_cookies.txt` 复用此文件
+- 后续所有 yt-dlp 命令都用 `--cookies ~/.craft/bili_cookies.txt` 复用此文件
 - cookies 会过期（通常数月），失败再次出现 412 时让用户重跑此命令更新
 
 如果用户使用 Firefox/Safari/Edge，把 `chrome` 替换为 `firefox` / `safari` / `edge` 即可。
@@ -179,7 +179,7 @@ B 站标题常含 `/`、`：`、`*`、`?`、`"`、`<`、`>`、`|` 等字符。
 
 工作步骤：
 
-1. 确认 cookies 文件存在（`~/.toolbox/bili_cookies.txt` 或用户指定路径）。
+1. 确认 cookies 文件存在（`~/.craft/bili_cookies.txt` 或用户指定路径）。
    不存在则按"前置条件 2"引导用户获取。
 2. 用一条 yt-dlp 命令下载，参数包括 `--cookies`、`--no-playlist`、清晰度 spec、输出路径。
 3. 若用户要转录，把视频文件路径交给 `local-transcribe` Skill。

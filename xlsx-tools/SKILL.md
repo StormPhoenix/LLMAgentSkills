@@ -2,7 +2,7 @@
 name: xlsx-tools
 description: Excel 电子表格（.xlsx）读取与创建。支持读取表格数据，以及从结构化数据生成新的 Excel 文件。
 metadata:
-  toolbox:
+  craft:
     type: skill
 ---
 

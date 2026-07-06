@@ -2,7 +2,7 @@
 name: cognitive-research
 description: 认知路径调研写作框架。当用户需要调研某个主题（技术、领域、代码库、工具等）并输出符合人类认知过程的文章时激活。触发词：「认知调研」「帮我调研」「写一篇调研文章」「深入了解」「/cresearch」。
 metadata:
-  toolbox:
+  craft:
     type: skill
 ---
 

@@ -7,7 +7,7 @@ description: >
   ⚠️ 转录为极耗时操作（数分钟），必须通过提交异步任务执行，不可同步等待结果。
   所有转录任务均为异步：提交后立即返回 job_id，结果通过查询或后台轮询获取。
 metadata:
-  toolbox:
+  craft:
     type: skill
 ---
 
@@ -357,7 +357,7 @@ cd /path/to/McpServerManager/servers/qwen-asr
 
 ## Skill 配置
 
-在 ToolBox Settings → Skill 配置中设置：
+在 Craft Settings → Skill 配置中设置：
 
 | 配置项 | 说明 | 默认值 |
 |--------|------|--------|

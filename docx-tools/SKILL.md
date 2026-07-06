@@ -2,7 +2,7 @@
 name: docx-tools
 description: Word 文档（.docx）读取与创建。支持按段落分段读取文档，以及从 Markdown 生成新的 Word 文档。
 metadata:
-  toolbox:
+  craft:
     type: skill
 ---
 

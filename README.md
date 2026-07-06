@@ -1,6 +1,6 @@
 # External Skills
 
-本仓库收录 **ToolBox** 外部 Skill（技能包）。Skill 是 ToolBox 的声明式工具单元，通过 `SKILL.md` 定义行为，可选附带 `manifest.yaml` 元数据与 `.cjs` 脚本。
+本仓库收录 **Craft** 外部 Skill（技能包）。Skill 是 Craft 的声明式工具单元，通过 `SKILL.md` 定义行为，可选附带 `manifest.yaml` 元数据与 `.cjs` 脚本。
 
 ---
 
@@ -20,7 +20,7 @@
 
 ## Skill 类型
 
-| 类型 | 说明 | `metadata.toolbox.type`（SKILL.md） | `type`（manifest.yaml） |
+| 类型 | 说明 | `metadata.craft.type`（SKILL.md） | `type`（manifest.yaml） |
 |------|------|-------------------------------------|------------------------|
 | **tool** | 提供具体工具能力（文件操作、图片生成、API 调用等） | `skill` | `- skill` |
 | **persona** | 扮演特定角色，提供特定思维框架与对话风格 | `persona` | `- persona` |
@@ -37,9 +37,9 @@
 
 | 场景 | 要求 |
 |------|------|
-| 角色模拟型（Persona） | `SKILL.md` frontmatter 中必须有 `metadata.toolbox.type: persona` |
-| 工具型（Tool） | `SKILL.md` frontmatter 中必须有 `metadata.toolbox.type: skill` |
-| 存在 `manifest.yaml` 时 | `type` 字段必须与 `SKILL.md` 中的 `metadata.toolbox.type` 一致 |
+| 角色模拟型（Persona） | `SKILL.md` frontmatter 中必须有 `metadata.craft.type: persona` |
+| 工具型（Tool） | `SKILL.md` frontmatter 中必须有 `metadata.craft.type: skill` |
+| 存在 `manifest.yaml` 时 | `type` 字段必须与 `SKILL.md` 中的 `metadata.craft.type` 一致 |
 
 **优先级**：当 `manifest.yaml` 与 `SKILL.md` frontmatter 中的类型存在冲突时，**`manifest.yaml` 中的 `type` 字段优先**。
 
@@ -52,7 +52,7 @@
 name: zhuge-liang
 description: 触发词「诸葛亮」「孔明」。三国蜀汉丞相，以三分析势法著称。
 metadata:
-  toolbox:
+  craft:
     type: persona       # ← 必须为 persona
 ---
 ```
@@ -71,7 +71,7 @@ type:
 name: hunyuan-image-gen
 description: 混元 AI 图片生成，支持文字描述生成图片。
 metadata:
-  toolbox:
+  craft:
     type: skill         # ← 必须为 skill
 ---
 ```
@@ -92,7 +92,7 @@ type:
 name: <skill-id>
 description: <单行描述，用于 LLM 决策是否激活该 Skill>
 metadata:
-  toolbox:
+  craft:
     type: skill | persona    # 必填，不可省略
 ---
 
@@ -112,7 +112,7 @@ displayName: 显示名称
 emoji: 🛠️
 category: productivity | creativity | utility
 type:
-  - skill | persona    # 必须与 SKILL.md 中 metadata.toolbox.type 一致；manifest.yaml 优先级更高
+  - skill | persona    # 必须与 SKILL.md 中 metadata.craft.type 一致；manifest.yaml 优先级更高
 autoActivate: false    # 是否自动激活（慎用）
 mcpTools:              # 声明本 Skill 依赖的 MCP 工具（可选）
   server: <mcp-server-name>
@@ -132,7 +132,7 @@ examples:              # 示例问句（推荐填写，用于模糊匹配）
 
 ### 自动发现字段：triggers / tags / examples
 
-ToolBox 采用**两阶段匹配**自动发现合适的 Skill，将匹配到的 Skill 注入 `<available_skills>` 供 LLM 按需激活：
+Craft 采用**两阶段匹配**自动发现合适的 Skill，将匹配到的 Skill 注入 `<available_skills>` 供 LLM 按需激活：
 
 | 阶段 | 字段 | 匹配方式 |
 |------|------|---------|
@@ -168,12 +168,12 @@ ToolBox 采用**两阶段匹配**自动发现合适的 Skill，将匹配到的 S
 | `pdf-tools/` | skill | PDF 文件读取，支持按页范围分段读取；适用于文档阅读与信息提取 |
 | `docx-tools/` | skill | Word 文档（.docx）读取与创建；支持按段落分段读取，以及从 Markdown 生成新文档 |
 | `xlsx-tools/` | skill | Excel 电子表格（.xlsx）读取与创建；支持读取表格数据，以及从二维数组生成新表格 |
-| `skill-creator/` | skill | ToolBox Skill 创作向导；指导用户从零编写符合规范的 Skill（SKILL.md + manifest.yaml + .cjs 脚本），覆盖工具型（skill）与角色型（persona）两种类型 |
+| `skill-creator/` | skill | Craft Skill 创作向导；指导用户从零编写符合规范的 Skill（SKILL.md + manifest.yaml + .cjs 脚本），覆盖工具型（skill）与角色型（persona）两种类型 |
 | `text-transform/` | skill | 文本处理工具箱：JSON 格式化、Base64 编解码、URL 编解码、哈希计算、字数统计、正则提取、UUID 生成、大小写转换；全部 SAFE 级别 |
 
-### 在 ToolBox 中加载
+### 在 Craft 中加载
 
-1. 打开 ToolBox → **Settings → Skill**
+1. 打开 Craft → **Settings → Skill**
 2. 点击"导入外部 Skill"
 3. 选择对应 Skill 目录（包含 `SKILL.md` 的文件夹）
 
@@ -186,11 +186,11 @@ ToolBox 采用**两阶段匹配**自动发现合适的 Skill，将匹配到的 S
 ## 编写规范
 
 - `SKILL.md` 中 `description` 字段是 LLM 激活判断的核心依据，**务必简洁精准**
-- `metadata.toolbox.type` **不可省略**，必须为 `skill` 或 `persona` 之一
-- `manifest.yaml` 中建议填写 `triggers` / `tags` / `examples`，以便 ToolBox 自动将 Skill 推荐给 LLM（详见上文"自动发现字段"）
+- `metadata.craft.type` **不可省略**，必须为 `skill` 或 `persona` 之一
+- `manifest.yaml` 中建议填写 `triggers` / `tags` / `examples`，以便 Craft 自动将 Skill 推荐给 LLM（详见上文"自动发现字段"）
 - Persona 类 Skill 应包含：角色身份、语气约束、核心心智模型、诚实边界
 - Tool 类 Skill 应包含：工具说明、参数表、响应格式、常见使用场景
-- 存在 `manifest.yaml` 时，其 `type` 字段必须与 `SKILL.md` 中 `metadata.toolbox.type` 保持一致，**`manifest.yaml` 中的值优先**
+- 存在 `manifest.yaml` 时，其 `type` 字段必须与 `SKILL.md` 中 `metadata.craft.type` 保持一致，**`manifest.yaml` 中的值优先**
 - `.cjs` 脚本**禁止 `require` 第三方 npm 包**，仅允许 Node 内置模块与 `electron`
 - **读取用户配置（`configs[]`）必须使用 `context.getConfig(key)`**，而非 `context.config.key`：
   ```javascript
@@ -208,10 +208,10 @@ ToolBox 采用**两阶段匹配**自动发现合适的 Skill，将匹配到的 S
 
 欢迎提交新的 Skill。每个 Skill 以独立目录 PR 提交，确保：
 
-- [ ] `SKILL.md` 包含完整 YAML frontmatter（`name` + `description` + `metadata.toolbox.type`）
-- [ ] `metadata.toolbox.type` 已正确填写（`skill` 或 `persona`）
+- [ ] `SKILL.md` 包含完整 YAML frontmatter（`name` + `description` + `metadata.craft.type`）
+- [ ] `metadata.craft.type` 已正确填写（`skill` 或 `persona`）
 - [ ] 如有 `manifest.yaml`，其 `type` 字段与 `SKILL.md` 中类型一致
 - [ ] 描述字段清晰说明适用场景和触发条件
-- [ ] **`type: skill` 的 Skill 建议填写 `triggers` / `tags` / `examples`**，以支持 ToolBox 自动发现（见上文"自动发现字段"）
+- [ ] **`type: skill` 的 Skill 建议填写 `triggers` / `tags` / `examples`**，以支持 Craft 自动发现（见上文"自动发现字段"）
 - [ ] 如有 `.cjs` 脚本，已验证不依赖第三方包
 - [ ] 在本 README 的"现有 Skill 列表"中登记

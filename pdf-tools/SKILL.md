@@ -2,7 +2,7 @@
 name: pdf-tools
 description: PDF 文件读取工具。支持按页范围分段读取 PDF 内容，适用于文档阅读、信息提取等场景。
 metadata:
-  toolbox:
+  craft:
     type: skill
 ---
 

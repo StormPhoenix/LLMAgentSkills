@@ -2,8 +2,8 @@
  * RSA 加密 Skill 脚本
  * 混合加密方案: AES-256-GCM + RSA-OAEP (SHA-256)
  * 
- * 密钥存储位置: ~/.toolbox/rsa-keys/
- * 密钥索引文件: ~/.toolbox/rsa-keys/keystore.json
+ * 密钥存储位置: ~/.craft/rsa-keys/
+ * 密钥索引文件: ~/.craft/rsa-keys/keystore.json
  */
 const crypto = require('crypto')
 const fs = require('fs')
@@ -47,7 +47,7 @@ function validatePath(filePath) {
 // ── 密钥存储 ───────────────────────────────────────────────────
 
 function getRsaKeysDir() {
-  return path.join(os.homedir(), '.toolbox', 'rsa-keys')
+  return path.join(os.homedir(), '.craft', 'rsa-keys')
 }
 
 function ensureDir() {

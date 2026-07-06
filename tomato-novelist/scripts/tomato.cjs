@@ -127,7 +127,7 @@ function checkAllChapters(directory, minWords = DEFAULT_MIN, maxWords = DEFAULT_
 }
 
 /**
- * ToolBox 工具入口：execute(input, context)，工具名通过 context.toolName 分发
+ * Craft 工具入口：execute(input, context)，工具名通过 context.toolName 分发
  */
 async function execute(input, context) {
   const toolName = context && context.toolName;
