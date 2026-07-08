@@ -157,6 +157,7 @@ Craft 采用**两阶段匹配**自动发现合适的 Skill，将匹配到的 Ski
 |------|------|------|
 | `bili-archiver/` | tool | B 站视频下载与归档指引（指引型，无 MCP 工具）；覆盖单次/批量/周期性场景，沉淀 cookies 获取、HTTP 412、分 P 视频、清晰度选择、文件命名等踩坑教训；与 `local-transcribe` 协同完成下载→转录链路 |
 | `hunyuan-image-gen/` | tool | 腾讯混元文生图，12 种预设风格 |
+| `live-knowledge-distiller/` | skill | 直播 ASR 转录文稿知识提炼（指引型，无 MCP 工具）；将非结构化直播文稿转化为结构化 Markdown 知识文档，涵盖去噪、知识点提取、主题归并、场景化输出；与 `bili-archiver`、`local-transcribe` 协作形成下载→转录→提炼流水线 |
 | `local-transcribe/` | tool | 本地语音/视频转录，支持 mp4/mkv/mp3 等，输出纯文字或 SRT 字幕；通过 configs 配置服务地址 |
 | `女娲-诸葛亮/` | persona | 三国蜀汉丞相诸葛亮思维框架 |
 | `女娲-曹孟德/` | persona | 三国魏武帝曹操思维框架 |
