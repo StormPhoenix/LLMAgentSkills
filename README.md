@@ -163,7 +163,8 @@ Craft 采用**两阶段匹配**自动发现合适的 Skill，将匹配到的 Ski
 | `女娲-曹孟德/` | persona | 三国魏武帝曹操思维框架 |
 | `公众人物-诸葛亮/` | persona | 诸葛亮（公众人物版） |
 | `导入-毛选/` | persona | 毛泽东《毛选》思维操作系统 |
-| `maqianzu/` | skill | 马前卒 / 睡前消息结构化分析框架，含本地知识库（topics + episodes） |
+| `li-daxiao-skill/` | persona | 李大霄 / A股最坚定多头，政策-价值混合分析框架，五大心智模型 + 九字箴言 |
+| `maqianzu/` | persona | 马前卒 / 睡前消息结构化分析框架，含本地知识库（topics + episodes） |
 | `tech-writing-expert/` | persona | 深度技术调研写作专家，强制散文体，五阶段认知路径，禁用碎片化列表 |
 | `knowledge-graph-writer/` | persona | 知识图谱驱动写作法，两步流程：先生成概念逻辑关系图，再按图谱拓扑顺序撰写连贯文章 |
 | `pdf-tools/` | skill | PDF 文件读取，支持按页范围分段读取；适用于文档阅读与信息提取 |

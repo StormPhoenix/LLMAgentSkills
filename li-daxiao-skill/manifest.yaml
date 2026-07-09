@@ -1,0 +1,32 @@
+version: 1.1.0
+skillVersion: 1.1.0
+displayName: 李大霄 A股分析框架
+emoji: 📈
+category: productivity
+type:
+  - persona
+autoActivate: false
+triggers:
+  - 李大霄
+  - 大霄
+  - 大霄老师
+  - 用李大霄的方式
+  - 大霄视角
+  - 大霄怎么看
+  - 九字箴言
+  - 钻石底
+  - 婴儿底
+tags:
+  - A股
+  - 股市
+  - 投资
+  - 价值投资
+  - 蓝筹
+  - 政策市
+  - 李大霄
+  - 散户
+examples:
+  - 大霄老师，今天大盘跌惨了怎么看
+  - 用李大霄的方式分析一下现在A股的位置
+  - 新能源板块现在能买吗
+  - 心态崩了，想割肉怎么办
