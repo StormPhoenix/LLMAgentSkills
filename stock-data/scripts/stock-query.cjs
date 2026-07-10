@@ -20,7 +20,10 @@ async function httpGet(url, options = {}) {
   try {
     const resp = await fetch(url, {
       signal: controller.signal,
-      headers: options.headers || {},
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+        ...options.headers,
+      },
     })
     if (!resp.ok) {
       throw new Error(`HTTP ${resp.status}: ${resp.statusText}`)
@@ -90,8 +93,8 @@ function toTencentCode(parsed) {
 // 东方财富 API
 // ============================================================
 
-const EM_QUOTE_URL = 'https://push2.eastmoney.com/api/qt/stock/get'
-const EM_KLINE_URL = 'https://push2his.eastmoney.com/api/qt/stock/kline/get'
+const EM_QUOTE_URL = 'https://push2delay.eastmoney.com/api/qt/stock/get'
+const EM_KLINE_URL = 'https://push2delay.eastmoney.com/api/qt/stock/kline/get'
 const EM_SEARCH_URL = 'https://searchapi.eastmoney.com/api/suggest/get'
 
 /**
@@ -99,7 +102,9 @@ const EM_SEARCH_URL = 'https://searchapi.eastmoney.com/api/suggest/get'
  */
 async function emSearch(keyword) {
   const url = `${EM_SEARCH_URL}?input=${encodeURIComponent(keyword)}&type=14&token=D43BF722C8E33BDC906FB84D85E326E8&count=10`
-  const data = await httpGet(url)
+  const data = await httpGet(url, {
+    headers: { Referer: 'https://www.eastmoney.com/' },
+  })
 
   if (!data?.QuotationCodeTable?.Data) {
     return []
@@ -123,7 +128,9 @@ async function emSearch(keyword) {
 async function emQuote(secid) {
   const fields = 'f43,f44,f45,f46,f47,f48,f51,f52,f57,f58,f60,f116,f117,f162,f167,f168,f170,f171'
   const url = `${EM_QUOTE_URL}?secid=${secid}&fields=${fields}`
-  const data = await httpGet(url)
+  const data = await httpGet(url, {
+    headers: { Referer: 'https://quote.eastmoney.com/' },
+  })
 
   if (!data?.data) {
     throw new Error('未获取到行情数据')
@@ -161,7 +168,9 @@ async function emQuote(secid) {
 async function emKline(secid, klt = '101', limit = 20, fqt = '0') {
   const fields = 'f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61'
   const url = `${EM_KLINE_URL}?secid=${secid}&klt=${klt}&fqt=${fqt}&lmt=${limit}&end=20500101&fields1=f1,f2,f3,f4,f5,f6&fields2=${fields}`
-  const data = await httpGet(url)
+  const data = await httpGet(url, {
+    headers: { Referer: 'https://quote.eastmoney.com/' },
+  })
 
   if (!data?.data?.klines) {
     throw new Error('未获取到 K 线数据')
@@ -404,25 +413,24 @@ async function cmdKline(argsArr) {
   }
   const fqt = FQ_MAP[fq.toLowerCase()] || '0'
 
-  if (parsed.market === 'sh' || parsed.market === 'sz') {
-    const secid = toEastmoneySecid(parsed)
-    return await emKline(secid, klt, limit, fqt)
-  }
-
-  // 港美股 K 线 — 用腾讯 web 接口
+  // A 股/港美股 K 线统一用腾讯 web 接口（东财 kline 接口不稳定）
   return await tencentKline(parsed, period, limit)
 }
 
 /**
- * 腾讯 web K 线接口（港美股）
+ * 腾讯 web K 线接口（A 股/港美股）
  */
 async function tencentKline(parsed, period, limit) {
   const periodMap = { 'day': 'day', 'week': 'week', 'month': 'month' }
   const p = periodMap[period.toLowerCase()] || 'day'
-  const code = parsed.market === 'hk' ? `hk${parsed.code}` : `us${parsed.code}`
+  const code = parsed.market === 'hk' ? `hk${parsed.code}`
+    : parsed.market === 'us' ? `us${parsed.code}`
+    : `${parsed.market}${parsed.code}`
 
   const url = `https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${code},${p},,,${limit},qfq`
-  const data = await httpGet(url)
+  const data = await httpGet(url, {
+    headers: { Referer: 'https://stockapp.finance.qq.com' },
+  })
 
   if (!data?.data?.[code]) {
     throw new Error('未获取到腾讯 K 线数据')
@@ -509,7 +517,9 @@ async function cmdFinance(argsArr) {
     // 基本面摘要
     const fields = 'f57,f58,f84,f85,f116,f117,f162,f167,f168,f173,f183,f184,f185,f186,f187,f188,f189,f190'
     const url = `${EM_QUOTE_URL}?secid=${secid}&fields=${fields}`
-    const data = await httpGet(url)
+    const data = await httpGet(url, {
+      headers: { Referer: 'https://quote.eastmoney.com/' },
+    })
     if (!data?.data) throw new Error('未获取到财务摘要')
     const d = data.data
     return {
@@ -547,7 +557,9 @@ async function cmdFinance(argsArr) {
   }
 
   const finUrl = `https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=${tableName}&filter=(SECUCODE%3D%22${parsed.code}.${parsed.market === 'sh' ? 'SH' : 'SZ'}%22)&pageSize=4&sortColumns=REPORT_DATE&sortTypes=-1`
-  const finData = await httpGet(finUrl)
+  const finData = await httpGet(finUrl, {
+    headers: { Referer: 'https://data.eastmoney.com/' },
+  })
 
   if (!finData?.result?.data) {
     return { message: '未获取到财报数据，可能该股票暂无数据' }
@@ -577,7 +589,9 @@ async function cmdProfile(argsArr) {
 
   const marketCode = `${parsed.market === 'sh' ? 'SH' : 'SZ'}${parsed.code}`
   const url = `https://emweb.securities.eastmoney.com/PC_HSF10/CompanySurvey/PageAjax?code=${marketCode}`
-  const data = await httpGet(url)
+  const data = await httpGet(url, {
+    headers: { Referer: 'https://emweb.securities.eastmoney.com/' },
+  })
 
   if (!data?.jbzl?.[0]) {
     return { message: '未获取到公司信息' }
@@ -623,10 +637,13 @@ async function cmdNews(argsArr) {
   }
 
   const code = `${parsed.code}.${parsed.market === 'sh' ? 'SH' : 'SZ'}`
-  const url = `https://search-api-web.eastmoney.com/search/jsonp?cb=&param=%7B%22uid%22%3A%22%22%2C%22keyword%22%3A%22${code}%22%2C%22type%22%3A%5B%22cmsArticleWebOld%22%5D%2C%22client%22%3A%22web%22%2C%22clientType%22%3A%22web%22%2C%22clientVersion%22%3A%22curr%22%2C%22param%22%3A%7B%22cmsArticleWebOld%22%3A%7B%22searchScope%22%3A%22default%22%2C%22sort%22%3A%22default%22%2C%22pageIndex%22%3A${page}%2C%22pageSize%22%3A${pageSize}%2C%22preTag%22%3A%22%22%2C%22postTag%22%3A%22%22%7D%7D%7D`
+    const url = `https://search-api-web.eastmoney.com/search/jsonp?cb=&param=%7B%22uid%22%3A%22%22%2C%22keyword%22%3A%22${code}%22%2C%22type%22%3A%5B%22cmsArticleWebOld%22%5D%2C%22client%22%3A%22web%22%2C%22clientType%22%3A%22web%22%2C%22clientVersion%22%3A%22curr%22%2C%22param%22%3A%7B%22cmsArticleWebOld%22%3A%7B%22searchScope%22%3A%22default%22%2C%22sort%22%3A%22default%22%2C%22pageIndex%22%3A${page}%2C%22pageSize%22%3A${pageSize}%2C%22preTag%22%3A%22%22%2C%22postTag%22%3A%22%22%7D%7D%7D`
 
   try {
-    const text = await httpGet(url, { raw: true })
+    const text = await httpGet(url, {
+      raw: true,
+      headers: { Referer: 'https://so.eastmoney.com/' },
+    })
     // 尝试去除 JSONP 包裹
     const jsonStr = text.replace(/^[^(]*\(/, '').replace(/\);?\s*$/, '')
     const data = JSON.parse(jsonStr)
@@ -667,8 +684,10 @@ async function cmdFund(argsArr) {
   const days = parseInt(argsArr[1]) || 10
 
   // 历史日级资金流
-  const url = `https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=${secid}&lmt=${days}&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57`
-  const data = await httpGet(url)
+  const url = `https://push2delay.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=${secid}&lmt=${days}&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57`
+  const data = await httpGet(url, {
+    headers: { Referer: 'https://quote.eastmoney.com/' },
+  })
 
   if (!data?.data?.klines) {
     return { message: '未获取到资金流向数据' }
@@ -709,8 +728,10 @@ async function cmdRank(argsArr) {
   const asc = (type === 'down' || type === '跌幅') ? 0 : 1
 
   const fields = 'f2,f3,f4,f5,f6,f7,f12,f14'
-  const url = `https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=${limit}&po=${asc}&fid=${sortField}&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048&fields=${fields}`
-  const data = await httpGet(url)
+  const url = `https://push2delay.eastmoney.com/api/qt/clist/get?pn=1&pz=${limit}&po=${asc}&fid=${sortField}&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048&fields=${fields}`
+  const data = await httpGet(url, {
+    headers: { Referer: 'https://quote.eastmoney.com/' },
+  })
 
   if (!data?.data?.diff) {
     return { message: '未获取到排行数据' }
