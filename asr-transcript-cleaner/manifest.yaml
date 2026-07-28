@@ -1,0 +1,56 @@
+version: "1.0.0"
+displayName: "ASR 转录文本清洗"
+emoji: "🧹"
+category: utility
+type:
+  - skill
+autoActivate: false
+
+triggers:
+  - ASR清洗
+  - 转录清洗
+  - 去字间空格
+  - 加标点
+  - 转录标点
+  - 转录格式化
+  - asr-cleaner
+tags:
+  - ASR
+  - 转录
+  - 文本清洗
+  - 标点
+  - 无损校验
+examples:
+  - 帮我清洗这个ASR转录文件，去掉字间空格加上标点
+  - 批量给直播转录文本加标点符号
+  - 这个转录文件字间有空格，帮我格式化一下
+
+tools:
+  - name: clean_asr
+    description: |
+      ASR 转录文本清洗工具。去除字间空格、保守插入标点、按句末标点换行、无损校验。
+      支持单文件和批量目录两种模式。
+
+      sourcePath 是文件时 → 单文件清洗，outputPath 为输出文件路径。
+      sourcePath 是目录时 → 批量清洗目录下所有 .txt 文件，outputPath 为输出目录。
+      checkOnly=true 时仅校验已有输出文件，不重新清洗。
+
+      每个文件会额外生成 .check.md 校验报告。
+      校验规则：去标点去换行后与源文去空格后逐字比较，必须完全一致。
+    inputSchema:
+      type: object
+      properties:
+        sourcePath:
+          type: string
+          description: 源文件或目录的绝对路径（文件→单文件模式，目录→批量模式）
+        outputPath:
+          type: string
+          description: 输出文件或目录的绝对路径
+        checkOnly:
+          type: boolean
+          description: 仅校验不重新清洗（默认 false）
+      required:
+        - sourcePath
+        - outputPath
+    riskLevel: MODERATE
+    scriptEntry: scripts/asr-cleaner.cjs
