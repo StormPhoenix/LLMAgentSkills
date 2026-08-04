@@ -1,0 +1,36 @@
+version: "1.0.0"
+displayName: "前沿信息追踪"
+emoji: "🔭"
+category: productivity
+type:
+  - skill
+autoActivate: false
+
+triggers:
+  - 追踪前沿
+  - 前沿信息
+  - 论文追踪
+  - 领域调研
+  - track frontier
+  - 前沿进展
+  - 领域动态
+  - 最新进展
+  - 帮我搜某个领域的最新进展
+  - frontier tracking
+
+tags:
+  - research
+  - arxiv
+  - papers
+  - survey
+  - 技术调研
+  - 论文
+  - 前沿追踪
+  - 趋势分析
+
+examples:
+  - 帮我追踪游戏Agent领域最近半个月的进展
+  - track the latest frontier in LLM reasoning
+  - 帮我调研一下最近多模态大模型有什么重要进展
+  - 最新的世界模型论文有哪些值得看的
+  - 我想知道最近两周 Rust 嵌入式开发有什么新动态
