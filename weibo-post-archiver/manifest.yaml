@@ -1,0 +1,32 @@
+version: "1.0.0"
+displayName: "微博博文归档器"
+emoji: "🗂️"
+category: productivity
+type:
+  - skill
+autoActivate: false
+mcpTools:
+  server: playwriter
+  include:
+    - execute
+    - reset
+triggers:
+  - 抓取微博
+  - 归档微博
+  - 搜索他的微博
+  - 下载微博博文
+  - 微博汇总
+  - 微博历史文章
+  - weibo archive
+tags:
+  - 微博
+  - 网页归档
+  - Playwriter
+  - 移动端微博
+  - Markdown
+  - 时间线
+examples:
+  - 搜索这个微博账号中包含某个关键词的全部博文，并归档成 Markdown
+  - 把“请至手机客户端查看”的微博转换成移动端链接并补全正文
+  - 分批抓取这个人的相关微博，每条保留发布时间、原始链接和原文
+  - 检查微博汇总文档是否有遗漏、重复链接或时间排序错误
