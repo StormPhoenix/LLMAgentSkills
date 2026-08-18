@@ -28,10 +28,10 @@ examples:
 tools:
   - name: clean_asr
     description: |
-      ASR 转录文本清洗工具。去除字间空格、保守插入标点、按句末标点换行、无损校验。
+      ASR 转录文本清洗工具。去除字间空格、保守插入标点、按句末标点换行、输出 Markdown 格式（含一级标题）、无损校验。
       支持单文件和批量目录两种模式。
 
-      sourcePath 是文件时 → 单文件清洗，outputPath 为输出文件路径。
+      sourcePath 是文件时 → 单文件清洗，outputPath 为输出文件路径（.md）。
       sourcePath 是目录时 → 批量清洗目录下所有 .txt 文件，outputPath 为输出目录。
       checkOnly=true 时仅校验已有输出文件，不重新清洗。
 

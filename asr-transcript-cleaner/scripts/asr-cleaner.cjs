@@ -595,8 +595,10 @@ function cleanFile(sourcePath, outputPath) {
   // 换行
   const finalText = applyLineBreaks(punctuatedText);
 
-  // 写入输出文件
-  fs.writeFileSync(outputPath, finalText, "utf-8");
+  // 写入输出文件（Markdown 格式，含一级标题）
+  const stem = path.basename(sourcePath, path.extname(sourcePath));
+  const mdContent = `# ${stem}\n\n${finalText}\n`;
+  fs.writeFileSync(outputPath, mdContent, "utf-8");
 
   // 校验
   const validation = validate(sourceText, finalText);
@@ -664,7 +666,7 @@ function cleanDirectory(sourceDir, outputDir, checkOnly = false) {
   for (const file of files) {
     const sourcePath = path.join(sourceDir, file);
     const stem = file.replace(/\.txt$/, "");
-    const outputPath = path.join(outputDir, stem + ".punctuated.txt");
+    const outputPath = path.join(outputDir, stem + ".md");
     const checkPath = path.join(outputDir, stem + ".check.md");
 
     if (checkOnly) {
@@ -675,7 +677,9 @@ function cleanDirectory(sourceDir, outputDir, checkOnly = false) {
       }
       const sourceText = fs.readFileSync(sourcePath, "utf-8");
       const cleanedText = fs.readFileSync(outputPath, "utf-8");
-      const validation = validate(sourceText, cleanedText);
+      // 去除 Markdown 标题行后再校验
+      const strippedText = cleanedText.replace(/^# .+\n\n/, "");
+      const validation = validate(sourceText, strippedText);
       results.push({
         sourcePath,
         outputPath,
@@ -757,7 +761,9 @@ async function execute(input, context) {
       }
       const sourceText = fs.readFileSync(sourcePath, 'utf-8');
       const cleanedText = fs.readFileSync(outputPath, 'utf-8');
-      const validation = validate(sourceText, cleanedText);
+      // 去除 Markdown 标题行后再校验
+      const strippedText = cleanedText.replace(/^# .+\n\n/, '');
+      const validation = validate(sourceText, strippedText);
 
       return {
         success: validation.isPass,
@@ -778,7 +784,7 @@ async function execute(input, context) {
 
     const result = cleanFile(sourcePath, outputPath);
     const report = generateCheckReport(result);
-    const checkPath = outputPath.replace(/\.punctuated\.txt$/, '.check.md');
+    const checkPath = outputPath.replace(/\.md$/, '.check.md');
     fs.writeFileSync(checkPath, report, 'utf-8');
 
     return {

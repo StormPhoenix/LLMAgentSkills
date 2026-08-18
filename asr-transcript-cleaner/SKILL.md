@@ -2,7 +2,7 @@
 name: asr-transcript-cleaner
 description: >
   触发词「ASR清洗」「转录清洗」「去字间空格」「加标点」「转录格式化」。
-  清洗中文 ASR 转录文本：去除字间空格、保守插入标点、按句末标点换行、无损校验。
+  清洗中文 ASR 转录文本：去除字间空格、保守插入标点、按句末标点换行、输出 Markdown 格式、无损校验。
   内置确定性脚本 asr-cleaner.cjs，保证 100% 字符保真。支持单文件和批量目录处理。
 metadata:
   craft:
@@ -12,7 +12,7 @@ metadata:
 # ASR 转录文本清洗（asr-transcript-cleaner）
 
 > **本 Skill 是"指引 + 脚本型"。** 内置 `asr-cleaner.cjs` 确定性脚本，
-> 通过工具 `clean_asr` 调用。脚本仅做机械规则操作（去空格、插标点、换行、校验），
+> 通过工具 `clean_asr` 调用。脚本仅做机械规则操作（去空格、插标点、换行、输出 MD 格式、校验），
 > 不"理解"文本，因此不会丢失任何字符。
 
 ## 何时激活此 Skill
@@ -52,7 +52,7 @@ metadata:
 ```javascript
 clean_asr({
   sourcePath: "G:/Workspace/RawResourceBase/做多中国的好人豆子/直播转录/26_07_13-xxx_BVxxx.txt",
-  outputPath: "G:/Workspace/RawResourceBase/做多中国的好人豆子/直播转录标点测试/26_07_13-xxx_BVxxx.punctuated.txt"
+  outputPath: "G:/Workspace/RawResourceBase/做多中国的好人豆子/直播转录标点测试/26_07_13-xxx_BVxxx.md"
 })
 ```
 
@@ -63,14 +63,14 @@ clean_asr({
 | `checkOnly` | boolean | ❌ | 默认 `false`，仅校验不重新清洗 |
 
 **单文件模式**（`sourcePath` 是文件）：
-- 生成 `<stem>.punctuated.txt`（清洗结果）和 `<stem>.check.md`（校验报告）
+- 生成 `<stem>.md`（清洗结果，含一级标题）和 `<stem>.check.md`（校验报告）
 
 **批量模式**（`sourcePath` 是目录）：
-- 处理目录下所有 `.txt` 文件，每个生成 `.punctuated.txt` 和 `.check.md`
+- 处理目录下所有 `.txt` 文件，每个生成 `.md` 和 `.check.md`
 - 返回汇总结果（通过数 / 失败数 / 失败文件列表）
 
 **仅校验模式**（`checkOnly: true`）：
-- 不重新清洗，对已有的 `.punctuated.txt` 做无损校验
+- 不重新清洗，对已有的 `.md` 做无损校验
 
 ## 标点插入规则
 
@@ -140,7 +140,7 @@ clean_asr({
 
 ### 5. 替换原始文件
 
-所有文件校验通过后，直接将 `.punctuated.txt` 内容覆盖对应的原始 `.txt`，随后清理 `.punctuated.txt` 和 `.check.md` 临时文件。校验未通过的文件不得替换。
+所有文件校验通过后，将 `.md` 文件移动到源文件同目录（文件名仅扩展名改为 `.md`），删除原始 `.txt` 文件，随后清理 `.check.md` 临时文件。校验未通过的文件不得替换。
 
 ## 标点质量说明
 
@@ -156,6 +156,6 @@ clean_asr({
 1. 用脚本批量清洗 → 得到无损、标点合理的输出
 2. 抽查可读性
 3. 对个别需要改进的文件，手动调整脚本输出（不是源文件），然后用 `checkOnly: true` 重新校验
-4. 全部校验通过后直接替换原始文件
+4. 全部校验通过后将 `.md` 移动到源目录并删除原始 `.txt`
 
 
