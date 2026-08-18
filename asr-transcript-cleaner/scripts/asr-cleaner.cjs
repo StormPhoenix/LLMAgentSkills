@@ -452,12 +452,13 @@ function insertPunctuationSimple(text) {
 // ============================================================
 
 /**
- * 按句末标点换行，每行不超过 MAX_CHARS_PER_LINE 个原始字符
+ * 按句末标点分段，每段不超过 MAX_CHARS_PER_LINE 个原始字符。
+ * 输出 Markdown 时使用空行分隔段落，避免渲染时相邻行被合并为同一段。
  *
  * 规则：
- * 1. 在句末标点（。？！）后换行
- * 2. 如果一行超过 MAX_CHARS_PER_LINE 个原始字符，在最近的逗号处换行
- * 3. 如果没有逗号且仍超限，在第 MAX_CHARS_PER_LINE 个字符处硬换行
+ * 1. 在句末标点（。？！）后分段
+ * 2. 如果一段超过 MAX_CHARS_PER_LINE 个原始字符，在最近的逗号处分段
+ * 3. 如果没有逗号且仍超限，在第 MAX_CHARS_PER_LINE 个字符处硬分段
  */
 function applyLineBreaks(text) {
   const lines = [];
@@ -500,7 +501,8 @@ function applyLineBreaks(text) {
     lines.push(currentLine);
   }
 
-  return lines.join("\n");
+  // Markdown 中单个换行会被渲染合并，因此用空行分隔段落。
+  return lines.join("\n\n");
 }
 
 /**
