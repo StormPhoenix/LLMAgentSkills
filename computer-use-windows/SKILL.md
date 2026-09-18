@@ -28,7 +28,7 @@ metadata:
 | `get_ui_tree` | 读取当前（或指定）窗口的 UIA 元素树——结构化感知，不耗图像 token |
 | `extract_text` / `extract_text_active_window` | OCR 提取屏幕/活动窗口文字（Windows 内置引擎） |
 | `get_window_text` | 通过 UI Automation 读取窗口文本内容（无需截图） |
-| `screenshot` / `screenshot_active_window` | 截屏。⚠️ 见下方"截图限制" |
+| `screenshot` / `screenshot_active_window` | 截屏。截图结果**注入视觉通道，可直接查看画面**（详见下方"截图使用指南"） |
 | `get_screen_size` / `get_cursor_position` | 屏幕尺寸 / 光标位置 |
 | `list_windows` | 列出所有打开的窗口 |
 
@@ -51,15 +51,18 @@ metadata:
 1. **先建立认知**：`list_windows` 或 `observe_screen` 了解当前环境，不要盲操作
 2. **结构化优先**：定位元素优先 `get_ui_tree` + `find_and_click_element`（精确、省 token）；只有 UIA 拿不到（自绘 UI、无障碍信息缺失）才退回坐标点击
 3. **小步验证**：每次操作后 `wait`（如需要）→ 重新观察（`observe_screen` / `get_ui_tree` / `extract_text`）确认结果，再进行下一步；多个确定性的连续动作可用 `batch_actions` 合并
-4. **读屏不截图**：只需了解界面内容时用 `extract_text` 或 `observe_screen(include_screenshot=False, include_ui_tree=True)`，不要为读文字而截图
+4. **读屏有度**：需要精确控件定位时用 `get_ui_tree` / `extract_text`（文本比图像省 token）；需要看布局/自绘 UI 时直接截图（已进视觉通道）
 5. **失败恢复**：点击无效时先检查窗口是否在前台（`focus_window`），再确认坐标/元素是否正确；连续失败则向用户说明现状
 
-## 截图限制（重要）
+## 截图使用指南
 
-`screenshot` 系工具的返回结果在 Craft 中**不会进入视觉通道**（以文本占位返回），你看不到截图内容。因此：
+`screenshot` 系工具的返回结果会注入 LLM 视觉通道，可直接查看画面内容。使用建议：
 
-- **不要**通过截图来"看"界面——用 `get_ui_tree` / `extract_text` / `observe_screen` 替代
-- 截图仅用于：保存文件供**用户**查看（返回结果中会包含文件路径，转告用户）
+- **验证操作结果**：每次 UI 操作后截图确认状态变化
+- **UIA 拿不到的场景**（自绘 UI 如微信、游戏画面）：截图 + 坐标点击是唯一路径
+- **省 token**：读文字/定位控件优先 `get_ui_tree` / `extract_text`（文本比图像便宜）；需要"看"时才截图
+- **历史淡出（K=1）**：仅最近一次截图在上下文中保留画面，更早的截图退化为占位文本；需要回看时重新截图
+- 截图返回中包含文件名、尺寸、大小信息，可向用户转告
 
 ## 常见场景
 
