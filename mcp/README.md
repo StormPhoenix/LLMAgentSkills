@@ -40,6 +40,7 @@
 | `playwriter` | npx 公共包 | 根目录 mcp.json | 浏览器自动化（需 Chrome 安装 Playwriter MCP 扩展）；配套 Skill：`playwriter-browser/` |
 | `comfyui` | npx 公共包 | 根目录 mcp.json | ComfyUI 能力自动化 |
 | `computer-use-windows` | 本地克隆 + Python | [computer-use-windows/setup.md](./computer-use-windows/setup.md) | Windows 桌面 GUI 自动化；配套 Skill：`computer-use-windows/` |
+| `open-computer-use` | npm 公共包 | [open-computer-use/setup.md](./open-computer-use/setup.md) | 跨平台 Computer Use（macOS AX 树 + 非侵入式操作）；配套 Skill：`computer-use-macos/` |
 
 ## 原则
 

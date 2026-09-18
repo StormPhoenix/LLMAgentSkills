@@ -22,6 +22,12 @@
       "args": ["/d", "/s", "/c", ".\\scripts\\launch-windows.cmd", "mcp"],
       "cwd": "C:\\Users\\jiaxianwang\\.craft\\mcp-servers\\computer-use-windows",
       "description": "Windows 桌面控制：截屏/鼠标键盘/UIA 元素树/窗口管理/Chrome"
+    },
+    "open-computer-use": {
+      "transportType": "stdio",
+      "command": "/Users/jiaxianwang/.craft/mcp-servers/npm-global/node_modules/.bin/open-computer-use",
+      "args": ["mcp"],
+      "description": "Computer Use：macOS AX 树感知 + 非侵入式点击输入（跨平台）"
     }
   }
 }

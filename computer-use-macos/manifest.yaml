@@ -1,0 +1,43 @@
+version: 1.0.0
+skillVersion: 1.0.0
+displayName: macOS 桌面自动化
+emoji: 🖥️
+category: productivity
+type:
+  - skill
+autoActivate: false
+mcpTools:
+  server: open-computer-use
+  include:
+    # 感知类
+    - list_apps
+    - get_app_state
+    # 操作类（全部面向 element_index 语义操作，非侵入式，默认不移动真实指针）
+    - click
+    - perform_secondary_action
+    - scroll
+    - drag
+    - type_text
+    - press_key
+    - set_value
+triggers:
+  - 操作桌面
+  - 打开应用
+  - 帮我点击
+  - 操作窗口
+  - 读屏幕
+  - 自动化
+  - macOS 自动化
+  - computer use
+tags:
+  - 桌面
+  - GUI
+  - 自动化
+  - macOS
+  - 无障碍
+  - AX
+examples:
+  - 帮我在 TextEdit 里写一段话并保存
+  - 看看计算器上有哪些按钮
+  - 打开系统设置看看当前蓝牙状态
+  - 在 Safari 里搜索 xxx
