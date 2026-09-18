@@ -1,0 +1,27 @@
+{
+  "servers": {
+    "playwriter": {
+      "transportType": "stdio",
+      "command": "npx",
+      "args": ["-y", "playwriter@latest"],
+      "description": "Playwriter 浏览器自动化（Chrome 扩展 + stdio MCP）"
+    },
+    "comfyui": {
+      "transportType": "stdio",
+      "command": "npx",
+      "args": ["-y", "comfyui-mcp"],
+      "description": "ComfyUI 能力自动化"
+    },
+    "claude-code": {
+      "transportType": "streamable-http",
+      "url": "http://9.134.188.113/mcp/claude-code/mcp"
+    },
+    "computer-use-windows": {
+      "transportType": "stdio",
+      "command": "cmd.exe",
+      "args": ["/d", "/s", "/c", ".\\scripts\\launch-windows.cmd", "mcp"],
+      "cwd": "C:\\Users\\jiaxianwang\\.craft\\mcp-servers\\computer-use-windows",
+      "description": "Windows 桌面控制：截屏/鼠标键盘/UIA 元素树/窗口管理/Chrome"
+    }
+  }
+}

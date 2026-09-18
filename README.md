@@ -18,7 +18,10 @@
 
 ---
 
-## Skill 类型
+## MCP Server 配置
+
+- [`mcp.json`](./mcp.json) — Craft MCP Server 配置清单（格式与 `~/.craft/mcp.json` 一致，合并时替换其中计算机特定的路径）
+- [`mcp/`](./mcp/README.md) — MCP 配置说明与各 server 的安装/踩坑记录（如 `mcp/computer-use-windows/setup.md`）
 
 | 类型 | 说明 | `metadata.craft.type`（SKILL.md） | `type`（manifest.yaml） |
 |------|------|-------------------------------------|------------------------|
