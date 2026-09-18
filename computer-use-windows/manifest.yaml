@@ -1,0 +1,74 @@
+version: 1.0.0
+skillVersion: 1.0.0
+displayName: Windows 桌面自动化
+emoji: 🖱️
+category: productivity
+type:
+  - skill
+autoActivate: false
+mcpTools:
+  server: computer-use-windows
+  include:
+    # 感知类
+    - observe_screen
+    - get_ui_tree
+    - extract_text
+    - extract_text_active_window
+    - get_window_text
+    - screenshot
+    - screenshot_active_window
+    - get_screen_size
+    - get_cursor_position
+    - list_windows
+    # 操作类
+    - click
+    - move_mouse
+    - drag_mouse
+    - scroll
+    - type_text
+    - type_unicode
+    - press_key
+    - hotkey
+    - find_and_click_element
+    # 窗口/应用
+    - focus_window
+    - run_program
+    - open_app
+    # 消息/批量
+    - send_text_to_window
+    - send_keys_to_window
+    - batch_actions
+    - wait
+    # chrome_* 工具已排除：浏览器任务统一走 playwriter-browser Skill
+triggers:
+  - 桌面自动化
+  - 操作桌面
+  - 控制鼠标
+  - 控制键盘
+  - 帮我点
+  - 帮我点击
+  - 自动点击
+  - 打开应用
+  - 操作窗口
+  - 切换窗口
+  - 读屏幕
+  - 屏幕文字
+  - 桌面操作
+  - Windows 自动化
+  - GUI 自动化
+  - computer use
+tags:
+  - 桌面
+  - GUI
+  - 自动化
+  - Windows
+  - 鼠标
+  - 键盘
+  - 截屏
+  - UIA
+  - OCR
+examples:
+  - 帮我打开记事本写一段话并保存
+  - 看看我现在屏幕上打开的窗口有哪些
+  - 帮我点击 XX 软件里的设置按钮
+  - 读取当前窗口里的文字内容

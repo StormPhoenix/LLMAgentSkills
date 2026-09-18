@@ -173,6 +173,7 @@ Craft 采用**两阶段匹配**自动发现合适的 Skill，将匹配到的 Ski
 | `skill-creator/` | skill | Craft Skill 创作向导；指导用户从零编写符合规范的 Skill（SKILL.md + manifest.yaml + .cjs 脚本），覆盖工具型（skill）与角色型（persona）两种类型 |
 | `asr-transcript-cleaner/` | tool | ASR 转录文本清洗预处理（指引+脚本型）；去除字间空格、保守插入标点、按句末标点换行、无损校验；内置 `asr-cleaner.cjs` 确定性脚本，保证 100% 字符保真 |
 | `text-transform/` | skill | 文本处理工具箱：JSON 格式化、Base64 编解码、URL 编解码、哈希计算、字数统计、正则提取、UUID 生成、大小写转换；全部 SAFE 级别 |
+| `computer-use-windows/` | skill | Windows 桌面 GUI 自动化（MCP 桥接型，对接 computer-use-windows MCP server）：截屏/鼠标键盘模拟/UIA 元素树定位/窗口管理/OCR 读屏；chrome_* 工具已排除（浏览器任务走 playwriter-browser） |
 
 ### 在 Craft 中加载
 
