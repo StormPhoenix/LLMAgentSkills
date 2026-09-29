@@ -3,13 +3,19 @@
     "playwriter": {
       "transportType": "stdio",
       "command": "npx",
-      "args": ["-y", "playwriter@latest"],
+      "args": [
+        "-y",
+        "playwriter@latest"
+      ],
       "description": "Playwriter 浏览器自动化（Chrome 扩展 + stdio MCP）"
     },
     "comfyui": {
       "transportType": "stdio",
       "command": "npx",
-      "args": ["-y", "comfyui-mcp"],
+      "args": [
+        "-y",
+        "comfyui-mcp"
+      ],
       "description": "ComfyUI 能力自动化"
     },
     "claude-code": {
@@ -19,15 +25,33 @@
     "computer-use-windows": {
       "transportType": "stdio",
       "command": "cmd.exe",
-      "args": ["/d", "/s", "/c", ".\\scripts\\launch-windows.cmd", "mcp"],
+      "args": [
+        "/d",
+        "/s",
+        "/c",
+        ".\\scripts\\launch-windows.cmd",
+        "mcp"
+      ],
       "cwd": "C:\\Users\\jiaxianwang\\.craft\\mcp-servers\\computer-use-windows",
       "description": "Windows 桌面控制：截屏/鼠标键盘/UIA 元素树/窗口管理/Chrome"
     },
     "open-computer-use": {
       "transportType": "stdio",
       "command": "/Users/jiaxianwang/.craft/mcp-servers/npm-global/node_modules/.bin/open-computer-use",
-      "args": ["mcp"],
+      "args": [
+        "mcp"
+      ],
       "description": "Computer Use：macOS AX 树感知 + 非侵入式点击输入（跨平台）"
+    },
+    "serena": {
+      "transportType": "stdio",
+      "command": "REPLACE_WITH_YOUR_HOME/.local/bin/serena",
+      "args": [
+        "start-mcp-server",
+        "--context",
+        "ide-assistant"
+      ],
+      "description": "Serena LSP 语义代码智能（符号查找/引用/大纲）；配套 Skill：serena-code-intelligence/"
     }
   }
 }

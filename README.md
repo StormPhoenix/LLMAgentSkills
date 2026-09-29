@@ -157,6 +157,7 @@ Craft 的 Skill 发现由 LLM 主动调用 `list_skills` 工具（可选 query �
 | `asr-transcript-cleaner/` | tool | ASR 转录文本清洗预处理（指引+脚本型）；去除字间空格、保守插入标点、按句末标点换行、无损校验；内置 `asr-cleaner.cjs` 确定性脚本，保证 100% 字符保真 |
 | `text-transform/` | skill | 文本处理工具箱：JSON 格式化、Base64 编解码、URL 编解码、哈希计算、字数统计、正则提取、UUID 生成、大小写转换；全部 SAFE 级别 |
 | `computer-use-windows/` | skill | Windows 桌面 GUI 自动化（MCP 桥接型，对接 computer-use-windows MCP server）：截屏/鼠标键盘模拟/UIA 元素树定位/窗口管理/OCR 读屏；chrome_* 工具已排除（浏览器任务走 playwriter-browser） |
+| `serena-code-intelligence/` | skill | 语义代码导航（MCP 桥接型，对接 serena MCP server）：LSP 符号查找 / 引用查找 / 文件大纲；只读查询，文件修改仍走内置 edit_file |
 
 ### 在 Craft 中加载
 

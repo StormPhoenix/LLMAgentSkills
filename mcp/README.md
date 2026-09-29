@@ -41,6 +41,7 @@
 | `comfyui` | npx 公共包 | 根目录 mcp.json | ComfyUI 能力自动化 |
 | `computer-use-windows` | 本地克隆 + Python | [computer-use-windows/setup.md](./computer-use-windows/setup.md) | Windows 桌面 GUI 自动化；配套 Skill：`computer-use-windows/` |
 | `open-computer-use` | npm 公共包 | [open-computer-use/setup.md](./open-computer-use/setup.md) | 跨平台 Computer Use（macOS AX 树 + 非侵入式操作）；配套 Skill：`computer-use-macos/` |
+| `serena` | uv tool 安装 | [serena/setup.md](./serena/setup.md) | LSP 语义代码智能（符号查找/引用/大纲，40+ 语言）；配套 Skill：`serena-code-intelligence/` |
 
 ## 原则
 

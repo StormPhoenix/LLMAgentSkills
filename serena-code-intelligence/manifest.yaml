@@ -1,0 +1,15 @@
+version: 1.0.0
+skillVersion: 1.0.0
+displayName: 语义代码导航（Serena LSP）
+emoji: 🧭
+category: productivity
+type:
+  - skill
+autoActivate: false
+mcpTools:
+  server: serena
+  include:
+    - activate_project
+    - find_symbol
+    - find_referencing_symbols
+    - get_symbols_overview
