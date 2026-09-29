@@ -2,26 +2,6 @@ version: "1.0.0"
 displayName: "Excel 工具"
 emoji: "📊"
 alwaysCandidate: false
-triggers:
-  - Excel
-  - xlsx
-  - .xlsx
-  - 表格
-  - 电子表格
-  - 创建excel
-  - 读取excel
-tags:
-  - excel
-  - 表格
-  - 数据
-  - 分析
-  - 创建
-  - 阅读
-examples:
-  - 帮我创建一个Excel表格
-  - 读取这个xlsx文件
-  - 帮我分析这份表格数据
-
 tools:
   - name: read_xlsx
     description: |

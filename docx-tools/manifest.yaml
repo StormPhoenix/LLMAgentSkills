@@ -2,24 +2,6 @@ version: "1.0.0"
 displayName: "Word 工具"
 emoji: "📃"
 alwaysCandidate: false
-triggers:
-  - Word
-  - docx
-  - .docx
-  - 文档
-  - 创建word
-  - 读取word
-tags:
-  - word
-  - 文档
-  - 编辑
-  - 创建
-  - 阅读
-examples:
-  - 帮我创建一个Word文档
-  - 读取这个docx文件
-  - 生成一份文档报告
-
 tools:
   - name: read_docx
     description: |

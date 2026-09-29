@@ -199,16 +199,6 @@ mcpTools:
   include:
     - <tool_name_1>
 
-# ⚠️ 自动发现字段——工具型 Skill 强烈推荐填写，否则 LLM 无法自动发现
-triggers:
-  - 触发词1
-  - 触发词2
-tags:
-  - 标签1
-  - 标签2
-examples:
-  - 用户可能这样问的示例1
-  - 用户可能这样问的示例2
 ```
 
 ### 角色型 Skill 的 manifest.yaml 模板（极简）：
@@ -221,26 +211,13 @@ category: creativity
 type:
   - persona
 autoActivate: false
-triggers:
-  - 触发词1
-  - 触发词2
-tags:
-  - 标签1
-examples:
-  - 示例问句1
 ```
 
 ### manifest.yaml 关键规则：
 
 1. **`type` 字段必须与 SKILL.md 中 `metadata.craft.type` 一致**；若冲突，`manifest.yaml` 优先。
 2. **`confirmHint`**：MODERATE 工具强烈推荐填写，支持 `{paramName}` 模板。渲染规则：`string` → 原样，`Array` → "N 项"，其他 → `JSON.stringify`。
-3. **自动发现三字段**（`triggers` / `tags` / `examples`）：
-   - `triggers`：填写用户提到就会直接触发这个 Skill 的词或短语，覆盖中英文、缩写、口语。
-   - `tags`：技能领域关键词，范围可略宽于 triggers。
-   - `examples`：写 2–3 个自然语言问句，模拟用户真实会说的话。
-   - 两阶段匹配：Stage 1 精确匹配（`name` + `triggers`）→ Stage 2 模糊匹配（`triggers` + `tags` + `examples`）。
-   - **不填写则 Skill 无法被自动发现**——LLM 看不到它，自然无法激活。
-   - 角色型 Skill 不参与自动发现，`triggers`/`tags`/`examples` 仅作文档用途。
+3. **自动发现机制**：Skill 发现由 LLM 主动调用 `list_skills`（可选 query 过滤）完成，`SKILL.md` 的 `description` 是唯一发现面——务必把触发场景、适用范围写进 description。**不要再声明 `triggers` / `tags` / `examples`**（已废弃，旧子串匹配机制已移除）。
 
 ---
 
@@ -369,7 +346,7 @@ module.exports = { execute }
 
 1. ❌ `inputSchema.properties` 的字段没写 `description` → LLM 不知道该传什么
 2. ❌ MODERATE 工具没写 `confirmHint` → 弹窗只能显示工具名，用户体验差
-3. ❌ 工具型 Skill 没写 `triggers`/`tags`/`examples` → Skill 无法被自动发现
+3. ❌ 声明了已废弃的 `triggers`/`tags`/`examples` 字段 → 发现只依赖 `description`，废弃字段属于无效负载
 4. ❌ `manifest.yaml` 的 `type` 和 SKILL.md 的 `metadata.craft.type` 不一致
 5. ❌ `.cjs` 脚本用了 `export default`（ESM）→ 必须 `module.exports = { execute }`（CJS）
 6. ❌ 脚本 `require` 了第三方包 → 用户环境无 node_modules

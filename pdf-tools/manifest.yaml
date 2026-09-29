@@ -2,22 +2,6 @@ version: "1.0.0"
 displayName: "PDF 工具"
 emoji: "📕"
 alwaysCandidate: false
-triggers:
-  - PDF
-  - pdf
-  - .pdf
-  - 读取pdf
-  - pdf文档
-tags:
-  - pdf
-  - 文档
-  - 阅读
-  - 提取
-examples:
-  - 帮我读取这个PDF文件
-  - 读取PDF的前几页
-  - 总结这个PDF文档的内容
-
 tools:
   - name: read_pdf
     description: |

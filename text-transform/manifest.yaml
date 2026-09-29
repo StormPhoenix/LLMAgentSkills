@@ -6,31 +6,6 @@ type:
   - skill
 autoActivate: false
 
-triggers:
-  - JSON 格式化
-  - Base64
-  - URL 编码
-  - URL 解码
-  - 哈希
-  - hash
-  - md5
-  - sha256
-  - 字数统计
-  - 正则
-  - UUID
-  - 大小写转换
-  - camelCase
-  - snake_case
-tags:
-  - 文本处理
-  - 编码解码
-  - 格式化
-  - 开发工具
-examples:
-  - 帮我格式化这段 JSON
-  - 把这段文字 Base64 编码
-  - 统计一下这段文字的字数
-
 tools:
   - name: text_transform
     displayName: "文本处理"

@@ -6,25 +6,6 @@ type:
   - skill
 autoActivate: false
 
-triggers:
-  - ASR清洗
-  - 转录清洗
-  - 去字间空格
-  - 加标点
-  - 转录标点
-  - 转录格式化
-  - asr-cleaner
-tags:
-  - ASR
-  - 转录
-  - 文本清洗
-  - 标点
-  - 无损校验
-examples:
-  - 帮我清洗这个ASR转录文件，去掉字间空格加上标点
-  - 批量给直播转录文本加标点符号
-  - 这个转录文件字间有空格，帮我格式化一下
-
 tools:
   - name: clean_asr
     description: |

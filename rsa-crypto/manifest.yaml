@@ -2,38 +2,6 @@ version: "1.0.0"
 emoji: "🔐"
 displayName: "RSA 加密工具"
 
-triggers:
-  - 加密
-  - 解密
-  - encrypt
-  - decrypt
-  - RSA
-  - rsa
-  - 加密字符串
-  - 解密字符串
-  - 加密文件
-  - 解密文件
-  - 密钥
-  - 生成密钥
-
-tags:
-  - 加密
-  - 解密
-  - RSA
-  - AES
-  - 密码学
-  - 安全
-  - crypto
-  - 密钥管理
-
-examples:
-  - 帮我加密这段密码
-  - 把这个字符串用RSA加密一下
-  - 解密这段Base64密文
-  - 帮我把桌面上的config.json加密
-  - 我需要生成一个新的RSA密钥对
-  - 列出我现有的加密密钥
-
 configs:
   - key: defaultKeyId
     label: 默认密钥 ID
